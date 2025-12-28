@@ -68,40 +68,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d036a3c4ab069c7b410a2ce876bd74808d2d0888a82667669f8e783a898bf1"
 
 [[package]]
-name = "astro-strip-whitespace"
-version = "0.1.0"
-dependencies = [
- "clap",
- "sourcemap",
- "thiserror",
- "tree-sitter",
- "tree-sitter-astro",
-]
-
-[[package]]
-name = "astro-strip-whitespace-fuzz"
-version = "0.0.0"
-dependencies = [
- "astro-strip-whitespace",
- "libfuzzer-sys",
- "serde_json",
-]
-
-[[package]]
-name = "astro-strip-whitespace-wasm"
-version = "0.1.0"
-dependencies = [
- "astro-strip-whitespace",
- "console_error_panic_hook",
- "js-sys",
- "serde",
- "serde-wasm-bindgen",
- "tsify",
- "wasm-bindgen",
- "wasm-bindgen-futures",
-]
-
-[[package]]
 name = "base64-simd"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -683,6 +649,40 @@ name = "streaming-iterator"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b2231b7c3057d5e4ad0156fb3dc807d900806020c5ffa3ee6ff2c8c76fb8520"
+
+[[package]]
+name = "strip-whitespace"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "sourcemap",
+ "thiserror",
+ "tree-sitter",
+ "tree-sitter-astro",
+]
+
+[[package]]
+name = "strip-whitespace-fuzz"
+version = "0.0.0"
+dependencies = [
+ "libfuzzer-sys",
+ "serde_json",
+ "strip-whitespace",
+]
+
+[[package]]
+name = "strip-whitespace-wasm"
+version = "0.1.0"
+dependencies = [
+ "console_error_panic_hook",
+ "js-sys",
+ "serde",
+ "serde-wasm-bindgen",
+ "strip-whitespace",
+ "tsify",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+]
 
 [[package]]
 name = "strsim"

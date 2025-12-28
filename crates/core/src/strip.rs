@@ -36,7 +36,7 @@
 
 use crate::{
     StripError,
-    edit::{Edit, create_sourcemap, rewrite_sourcemap, validate_edits},
+    edit::{Edit, create_sourcemap, validate_edits},
     parse::parse_astro,
 };
 
@@ -59,25 +59,11 @@ pub struct CodeAndSourcemap {
     pub sourcemap: String,
 }
 
-/// Strip inter-node whitespace and **rewrite** an existing sourcemap.
-///
-/// Use this when you already have a sourcemap for `source` (e.g. from a prior compilation step)
-/// and want a corresponding sourcemap for the stripped output.
-pub fn strip_astro_whitespace_sourcemap_rewrite(
-    source: &str,
-    input_sourcemap_json: &str,
-    config: &StripConfig,
-) -> Result<CodeAndSourcemap, StripError> {
-    let (code, edits) = rewrite(source, config)?;
-    let sourcemap = rewrite_sourcemap(source, &code, input_sourcemap_json, &edits)?;
-    Ok(CodeAndSourcemap { code, sourcemap })
-}
-
-/// Strip inter-node whitespace and **create** a brand-new sourcemap.
+/// Strip inter-node whitespace and create a brand-new sourcemap.
 ///
 /// This exists so callers can still obtain a sourcemap even if upstream tooling does not emit
 /// one. The returned sourcemap maps the stripped output back to `source`.
-pub fn strip_astro_whitespace_sourcemap_create(
+pub fn strip_astro_whitespace(
     source: &str,
     source_filename: &str,
     config: &StripConfig,
@@ -399,8 +385,8 @@ fn contains_blank_line(ws: &str) -> bool {
 /// its originating input offset within the input segment.
 fn rotate_delim_over_gap(delim: TrailingDelim, gap: &str) -> (String, Vec<usize>) {
     // Original segment is: delim + gap
-    // We want: (optional filler) + gap' + delim
-    // Where filler is one space/tab “stolen” from the *end* of indentation on the line
+    // We want: (optional stolen indent) + gap' + delim
+    // Where stolen indent is one space/tab "stolen" from the end of indentation on the line
     // where the next node begins, to preserve column numbers when possible.
 
     let delim_bytes = delim.bytes();
@@ -596,9 +582,7 @@ mod tests {
     #[test]
     fn emits_sourcemap_without_input() {
         let src = "<div>\n  <span>ok</span>\n</div>\n";
-        let res =
-            strip_astro_whitespace_sourcemap_create(src, "input.astro", &StripConfig::default())
-                .unwrap();
+        let res = strip_astro_whitespace(src, "input.astro", &StripConfig::default()).unwrap();
         let sm = sourcemap::SourceMap::from_slice(res.sourcemap.as_bytes()).unwrap();
         assert_eq!(sm.get_source(0), Some("input.astro"));
     }

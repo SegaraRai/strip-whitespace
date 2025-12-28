@@ -1,1 +1,0 @@
-import"./legacy.UfnI0nb4.js";import{h as r,t as u,n as c,j as m,k as l,r as f,m as i,a,o as p,s as b}from"./render.DwOFLgPh.js";var v=r('<button type="button"> </button>');function h(o){let e=p(0);function n(){b(e,a(e)+1)}var t=v(),s=l(t);f(t),u(()=>i(s,`Count: ${a(e)??""}`)),c("click",t,n),m(o,t)}export{h as default};

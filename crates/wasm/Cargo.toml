@@ -1,5 +1,5 @@
 [package]
-name = "astro-strip-whitespace-wasm"
+name = "strip-whitespace-wasm"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
@@ -8,7 +8,7 @@ license = "MIT"
 crate-type = ["cdylib"]
 
 [dependencies]
-astro-strip-whitespace = { path = "../core" }
+strip-whitespace = { path = "../core" }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"

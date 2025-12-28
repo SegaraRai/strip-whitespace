@@ -1,6 +1,6 @@
 #![no_main]
 
-use astro_strip_whitespace::strip::{StripConfig, strip_astro_whitespace_no_sourcemap};
+use strip_whitespace::strip::{StripConfig, strip_astro_whitespace_no_sourcemap};
 use libfuzzer_sys::fuzz_target;
 
 fuzz_target!(|data: &[u8]| {

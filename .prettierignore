@@ -1,2 +1,5 @@
 pnpm-workspace.yaml
 tsconfig.json
+
+fixtures
+snapshots

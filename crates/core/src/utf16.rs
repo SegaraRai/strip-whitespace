@@ -2,8 +2,8 @@
 //!
 //! This module provides a fast mapping between:
 //!
-//! - absolute **byte offsets** into a UTF-8 `&str`, and
-//! - `(line, column)` positions where `column` is measured in **UTF-16 code units**.
+//! - absolute byte offsets into a UTF-8 `&str`, and
+//! - `(line, column)` positions where `column` is measured in UTF-16 code units.
 //!
 //! This matches the de-facto convention used by JavaScript tooling (including many sourcemap
 //! consumers), where string indices and columns are typically expressed in UTF-16 code units.

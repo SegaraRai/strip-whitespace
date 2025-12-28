@@ -1,0 +1,83 @@
+{
+  "name": "unplugin-strip-whitespace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./astro": "./dist/astro.mjs",
+    "./esbuild": "./dist/esbuild.mjs",
+    "./farm": "./dist/farm.mjs",
+    "./nuxt": "./dist/nuxt.mjs",
+    "./rollup": "./dist/rollup.mjs",
+    "./rspack": "./dist/rspack.mjs",
+    "./types": "./dist/types.mjs",
+    "./vite": "./dist/vite.mjs",
+    "./webpack": "./dist/webpack.mjs",
+    "./package.json": "./package.json"
+  },
+  "imports": {
+    "#wasm": "./src/internal/wasm.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "unplugin": "^2.3.11"
+  },
+  "devDependencies": {
+    "@nuxt/kit": "^4.2.2",
+    "@nuxt/schema": "^4.2.2",
+    "@types/node": "^25.0.3",
+    "astro": "^5.16.6",
+    "prettier": "^3.7.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "rollup": "^4.54.0",
+    "strip-whitespace-wasm": "workspace:*",
+    "tsdown": "^0.18.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16",
+    "webpack": "^5.104.1"
+  },
+  "peerDependencies": {
+    "@farmfe/core": "^1",
+    "@nuxt/kit": "^3 || ^4",
+    "@nuxt/schema": "^3 || ^4",
+    "esbuild": "*",
+    "rollup": "^3 || ^4",
+    "vite": ">=3",
+    "webpack": "^4 || ^5"
+  },
+  "peerDependenciesMeta": {
+    "@farmfe/core": {
+      "optional": true
+    },
+    "@nuxt/kit": {
+      "optional": true
+    },
+    "@nuxt/schema": {
+      "optional": true
+    },
+    "esbuild": {
+      "optional": true
+    },
+    "rollup": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    },
+    "webpack": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run"
+  }
+}

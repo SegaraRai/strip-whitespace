@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
-use astro_strip_whitespace::strip::{
-    StripConfig, strip_astro_whitespace_no_sourcemap, strip_astro_whitespace_sourcemap_create,
+use strip_whitespace::strip::{
+    StripConfig, strip_astro_whitespace, strip_astro_whitespace_no_sourcemap,
 };
 
 fn fixtures_dir() -> PathBuf {
@@ -59,9 +59,7 @@ fn fixtures_emit_parseable_sourcemaps() {
         let expected = read_fixture(expected_name);
 
         // Source filename is the fixture filename; tests assert this gets recorded.
-        let res =
-            strip_astro_whitespace_sourcemap_create(&input, input_name, &StripConfig::default())
-                .unwrap();
+        let res = strip_astro_whitespace(&input, input_name, &StripConfig::default()).unwrap();
         assert_eq!(res.code, expected, "code mismatch: {input_name}");
 
         let map = sourcemap::SourceMap::from_slice(res.sourcemap.as_bytes())
