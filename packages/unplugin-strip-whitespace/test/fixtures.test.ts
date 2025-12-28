@@ -21,11 +21,11 @@ it.each(fixtures)("transforms fixture: %s", async (fixtureFilename) => {
 
   const expectedCode = await readFile(
     new URL(`${fixture}.out${extension}`, fixturesDir),
-    "utf-8"
+    "utf-8",
   );
   const expectedMap = await readFile(
     new URL(`${fixture}.out${extension}.map`, fixturesDir),
-    "utf-8"
+    "utf-8",
   );
 
   const input = await readFile(new URL(fixtureFilename, fixturesDir), "utf-8");

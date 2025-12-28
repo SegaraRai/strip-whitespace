@@ -1,7 +1,7 @@
 #![no_main]
 
-use strip_whitespace::strip::{StripConfig, strip_astro_whitespace_no_sourcemap};
 use libfuzzer_sys::fuzz_target;
+use strip_whitespace::strip::{StripConfig, strip_astro_whitespace_no_sourcemap};
 
 fuzz_target!(|data: &[u8]| {
     // Limit input size to keep the fuzzer fast and avoid OOM in pathological cases.

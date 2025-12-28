@@ -10,7 +10,7 @@ export function initWasmOnce(): InitOutput {
   if (!initOutput) {
     // On Vite(st), we need to resolve the wasm path on runtime.
     const wasmPath = createRequire(import.meta.url).resolve(
-      "strip-whitespace-wasm/index_bg.wasm"
+      "strip-whitespace-wasm/index_bg.wasm",
     );
     const wasm = readFileSync(wasmPath);
     initOutput = initSync({ module: wasm });

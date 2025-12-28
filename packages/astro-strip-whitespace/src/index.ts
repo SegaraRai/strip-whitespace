@@ -3,7 +3,7 @@ import type { StripWhitespaceOptions } from "unplugin-strip-whitespace";
 import viteStripWhitespace from "unplugin-strip-whitespace/vite";
 
 function astroStripWhitespace(
-  options: StripWhitespaceOptions = {}
+  options: StripWhitespaceOptions = {},
 ): AstroIntegration {
   return {
     name: "astro-strip-whitespace",

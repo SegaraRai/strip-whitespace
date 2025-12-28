@@ -19,6 +19,11 @@
     "@astrojs/svelte": "^7.2.0",
     "@types/node": "^25.0.3",
     "@tailwindcss/vite": "^4.0.0",
+    "prettier": "^3.7.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-svelte": "^3.4.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.9.3"
   }

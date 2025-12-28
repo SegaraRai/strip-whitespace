@@ -3,7 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 
 const docs = (await getCollection("docs")).sort((a, b) =>
-  a.slug.localeCompare(b.slug)
+  a.slug.localeCompare(b.slug),
 );
 ---
 

@@ -40,14 +40,14 @@ export const unpluginFactory: UnpluginFactory<
         }
 
         const pluginIndex = config.plugins.findIndex((plugin) =>
-          viteMovePluginBefore.test(plugin.name)
+          viteMovePluginBefore.test(plugin.name),
         );
         if (pluginIndex === -1) {
           return;
         }
 
         const thisPluginIndex = config.plugins.findIndex(
-          (plugin) => plugin.name === UNPLUGIN_NAME
+          (plugin) => plugin.name === UNPLUGIN_NAME,
         );
         if (thisPluginIndex === -1) {
           return;
@@ -59,7 +59,7 @@ export const unpluginFactory: UnpluginFactory<
         (config.plugins as (typeof config.plugins)[number][]).splice(
           pluginIndex,
           0,
-          thisPlugin
+          thisPlugin,
         );
       },
     },

@@ -7,9 +7,11 @@
 </p>
 
 <p>
-  Svelte has own whitespace handling so Astro's strip-whitespace feature should not affect it.
+  Svelte has own whitespace handling so Astro's strip-whitespace feature should
+  not affect it.
 </p>
 
+<!-- prettier-ignore -->
 <p>
   Consecutive
     spaces

@@ -1,7 +1,7 @@
 import { unplugin, type StripWhitespaceOptions } from ".";
 
 export default function astroStripWhitespace(
-  options: StripWhitespaceOptions
+  options: StripWhitespaceOptions,
 ): any {
   return {
     name: "astro-strip-whitespace",

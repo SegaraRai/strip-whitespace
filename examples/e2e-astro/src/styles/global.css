@@ -10,7 +10,7 @@
   }
 
   a {
-    @apply text-sky-700 hover:text-sky-900 underline underline-offset-2;
+    @apply text-sky-700 underline underline-offset-2 hover:text-sky-900;
   }
 
   code {

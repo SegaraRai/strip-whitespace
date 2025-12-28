@@ -21,11 +21,11 @@ describe("wasm stress", () => {
 
     const layoutUrl = new URL(
       "../../../examples/e2e-astro/src/layouts/Layout.astro",
-      import.meta.url
+      import.meta.url,
     );
     const complexUrl = new URL(
       "../../../fixtures/complex.astro",
-      import.meta.url
+      import.meta.url,
     );
 
     const layout = await readFile(layoutUrl, "utf8");
@@ -56,12 +56,12 @@ describe("wasm stress", () => {
               `input.length=${input.length}`,
               `wasm.memory.bytes=${memBytes ?? "unknown"}`,
               `error=${String((error as any)?.stack ?? error)}`,
-            ].join("\n")
+            ].join("\n"),
           );
         }
         if (out !== baseline) {
           throw new Error(
-            `non-deterministic output for ${name} at iteration ${i}`
+            `non-deterministic output for ${name} at iteration ${i}`,
           );
         }
       }

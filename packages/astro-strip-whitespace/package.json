@@ -22,7 +22,6 @@
     "astro": "^5.16.6",
     "strip-whitespace-wasm": "workspace:*",
     "prettier": "^3.7.4",
-    "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "tsdown": "^0.18.3",
     "typescript": "^5.9.3",

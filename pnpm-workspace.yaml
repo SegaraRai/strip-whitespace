@@ -3,8 +3,8 @@ packages:
   - examples/*
 
 onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
-# - core-js
+  - "@tailwindcss/oxide"
+  # - core-js
   - esbuild
   - sharp
   - wasm-pack
