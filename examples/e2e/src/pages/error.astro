@@ -1,0 +1,23 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Error demo">
+  <h1 class="mb-4 text-3xl font-bold">Error demo</h1>
+
+  <p>
+    What happens if a component throws an error during rendering? Does it show
+    correct source location after stripping whitespace?
+
+    <strong>Let's check!</strong>
+  </p>
+
+  <p>
+    Just uncomment the code below to trigger an error. Does Astro show the
+    correct source location in the error overlay?
+  </p>
+
+  {
+    // <div>{(null as any).foo}</div>
+  }
+</Layout>

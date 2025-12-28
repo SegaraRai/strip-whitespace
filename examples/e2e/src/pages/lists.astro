@@ -1,0 +1,12 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ConditionalListDemo from "../components/ConditionalListDemo.astro";
+---
+
+<Layout title="List demo">
+  <h1 class="mb-4 text-3xl font-bold">List demo</h1>
+
+  <ConditionalListDemo />
+
+  <ConditionalListDemo items={["alpha", "beta"]} showExtras={false} />
+</Layout>

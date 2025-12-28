@@ -1,0 +1,22 @@
+[package]
+name = "astro-strip-whitespace"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+thiserror = "2"
+sourcemap = "9"
+tree-sitter = "0.26"
+tree-sitter-astro = { path = "../../../tree-sitter-astro" }
+
+[dev-dependencies]
+clap = { version = "4", features = ["derive"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1

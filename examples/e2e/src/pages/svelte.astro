@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SvelteCounter from "../components/SvelteCounter.svelte";
+import SvelteHello from "../components/SvelteHello.svelte";
+---
+
+<Layout title="Svelte demo">
+  <h1 class="mb-4 text-3xl font-bold">Svelte demo</h1>
+
+  <SvelteHello name="Astro + Svelte" client:load />
+
+  <SvelteCounter client:load />
+</Layout>

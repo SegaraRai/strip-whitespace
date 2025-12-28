@@ -1,0 +1,14 @@
+node_modules
+
+dist
+target
+
+# cargo-fuzz
+fuzz/artifacts
+fuzz/corpus/**
+!fuzz/corpus/**/README.md
+!fuzz/corpus/**/.gitkeep
+!fuzz/corpus/**/seed_*
+fuzz/coverage
+fuzz/target
+**/*.profraw

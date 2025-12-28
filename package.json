@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "astro-strip-whitespace-workspace",
+  "type": "module",
+  "scripts": {
+    "test": "pnpm -r test",
+    "build:e2e": "pnpm -C examples/e2e run build",
+    "build:integration": "pnpm -C packages/astro-strip-whitespace run build",
+    "build:wasm": "cd crates/wasm && wasm-pack build --target web --release --out-dir ../../packages/wasm-placeholder/dist --out-name index",
+    "build:wasm-dev": "cd crates/wasm && wasm-pack build --target web --dev --no-opt --out-dir ../../packages/wasm-placeholder/dist --out-name index",
+    "build": "pnpm build:wasm && pnpm build:integration && pnpm build:e2e",
+    "dev:e2e": "pnpm -C examples/e2e run dev"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "vitest": "^4.0.16",
+    "wasm-pack": "^0.13.1"
+  }
+}

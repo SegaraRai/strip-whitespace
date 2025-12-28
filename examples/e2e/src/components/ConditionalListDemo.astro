@@ -1,0 +1,45 @@
+---
+export interface Props {
+  items?: string[];
+  showExtras?: boolean;
+}
+
+const { items = ["one", "two", "three"], showExtras = true } = Astro.props;
+---
+
+<!-- prettier-ignore -->
+<section>
+  <h2>
+    Conditional + list demo
+  </h2>
+
+  <ul>
+    {items.map((item, index) => (
+      <li>
+        <span>
+          {index}
+        </span>
+
+        <span>
+          {item}
+        </span>
+
+        {showExtras ? (
+          <small>
+            extra
+          </small>
+        ) : null}
+      </li>
+    ))}
+  </ul>
+
+  {showExtras ? (
+    <p>
+      Extras are ON.
+    </p>
+  ) : (
+    <p>
+      Extras are OFF.
+    </p>
+  )}
+</section>

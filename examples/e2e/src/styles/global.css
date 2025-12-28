@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    @apply bg-slate-50 text-slate-900;
+  }
+
+  body {
+    @apply min-h-screen;
+  }
+
+  a {
+    @apply text-sky-700 hover:text-sky-900 underline underline-offset-2;
+  }
+
+  code {
+    @apply rounded bg-slate-100 px-1 py-0.5 text-[0.95em];
+  }
+}

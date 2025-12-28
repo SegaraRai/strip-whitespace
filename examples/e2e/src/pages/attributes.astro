@@ -1,0 +1,12 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AttributesDemo from "../components/AttributesDemo.astro";
+---
+
+<Layout title="Attributes demo">
+  <h1 class="mb-4 text-3xl font-bold">Attributes demo</h1>
+
+  <AttributesDemo active={true} count={5} />
+
+  <AttributesDemo active={false} count={2} />
+</Layout>

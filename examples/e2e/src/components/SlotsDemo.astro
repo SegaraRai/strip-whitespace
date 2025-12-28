@@ -1,0 +1,42 @@
+---
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!-- prettier-ignore -->
+<section>
+  <h2>
+    {title}
+  </h2>
+
+  <div>
+    <h3>
+      Default slot
+    </h3>
+
+    <div>
+      <slot>
+        <em>
+          (default slot fallback)
+        </em>
+      </slot>
+    </div>
+  </div>
+
+  <div>
+    <h3>
+      Named slot: aside
+    </h3>
+
+    <aside>
+      <slot name="aside">
+        <strong>
+          (aside fallback)
+        </strong>
+      </slot>
+    </aside>
+  </div>
+</section>

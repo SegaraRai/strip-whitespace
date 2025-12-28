@@ -1,0 +1,34 @@
+---
+export interface Props {
+  active?: boolean;
+  count?: number;
+}
+
+const { active = false, count = 3 } = Astro.props;
+const classes = {
+  active,
+  inactive: !active,
+};
+---
+
+<!-- prettier-ignore -->
+<section>
+  <h2>
+    Attributes demo
+  </h2>
+
+  <p class:list={classes} data-active={active ? "yes" : "no"} aria-live="polite">
+    Active:
+    {active ? "true" : "false"}
+  </p>
+
+  <input type="checkbox" checked={active} />
+
+  <div>
+    {Array.from({ length: count }, (_, i) => (
+      <span>
+        #{i + 1}
+      </span>
+    ))}
+  </div>
+</section>

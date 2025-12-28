@@ -1,0 +1,40 @@
+---
+const raw = `Line 1
+
+    Line 2 indented
+Line 3`;
+---
+
+<!-- prettier-ignore -->
+<section>
+  <h2>
+    Mixed content demo
+  </h2>
+
+  <p>
+    Text
+    <strong>
+      with
+    </strong>
+    inline
+    <em>
+      tags
+    </em>
+    and
+    spaces.
+  </p>
+
+  <pre>
+{raw}
+  </pre>
+
+  <!-- Intentionally spaced comment -->
+
+  <div>
+    {"A"}
+
+    {"B"}
+
+    {"C"}
+  </div>
+</section>

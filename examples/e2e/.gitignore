@@ -1,0 +1,6 @@
+node_modules/
+.astro/
+dist/
+.astro-strip-whitespace-dumps/
+.venv/
+.DS_Store

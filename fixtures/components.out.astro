@@ -1,0 +1,15 @@
+---
+import Card from "../components/Card.astro";
+
+const items = ["alpha", "beta", "gamma"];
+---
+
+<div 
+ ><Card title="Demo"   
+
+/><ul 
+   >{items.map((item) => (
+      <li class="item">{item.toUpperCase()}</li>
+    )) 
+ }</ul
+></div>

@@ -1,0 +1,16 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SlotsDemo from "../components/SlotsDemo.astro";
+---
+
+<Layout title="Slots demo">
+  <h1 class="mb-4 text-3xl font-bold">Slots demo</h1>
+
+  <SlotsDemo title="Slots component">
+    <p>This is default slot content.</p>
+
+    <div slot="aside">
+      <p>This is content for the named slot.</p>
+    </div>
+  </SlotsDemo>
+</Layout>

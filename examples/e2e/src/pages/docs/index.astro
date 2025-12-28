@@ -1,0 +1,29 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const docs = (await getCollection("docs")).sort((a, b) =>
+  a.slug.localeCompare(b.slug)
+);
+---
+
+<Layout title="Docs index">
+  <h1 class="mb-4 text-3xl font-bold">Docs</h1>
+
+  <p>This page lists content loaded from Markdown and MDX.</p>
+
+  <p>
+    Note: We don’t support MD/MDX whitespace transformation; rendered content
+    may include extra whitespace and that’s OK.
+  </p>
+
+  <ul>
+    {
+      docs.map((entry) => (
+        <li>
+          <a href={`/docs/${entry.slug}`}>{entry.data.title}</a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>

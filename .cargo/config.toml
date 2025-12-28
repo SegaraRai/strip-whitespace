@@ -1,0 +1,15 @@
+[build]
+#target = "wasm32-unknown-unknown"
+
+[target.wasm32-unknown-unknown]
+runner = "wasm-bindgen"
+rustflags = [
+  "-C",
+  "link-arg=-z",
+  # Increase stack size to 8 MiB to avoid stack overflows
+  "-C",
+  "link-arg=stack-size=8388608",
+]
+
+[target.wasm32-wasip2]
+runner = ["wasmtime", "run", "--dir=.::/workspace"]

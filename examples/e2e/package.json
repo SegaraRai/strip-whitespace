@@ -1,0 +1,25 @@
+{
+  "name": "astro-strip-whitespace-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node -e \"console.log('No e2e tests configured yet')\""
+  },
+  "dependencies": {
+    "astro": "^5.16.6",
+    "astro-strip-whitespace": "workspace:*",
+    "svelte": "^5.38.2"
+  },
+  "devDependencies": {
+    "@astrojs/mdx": "^4.3.4",
+    "@astrojs/svelte": "^7.2.0",
+    "@types/node": "^25.0.3",
+    "@tailwindcss/vite": "^4.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.3"
+  }
+}

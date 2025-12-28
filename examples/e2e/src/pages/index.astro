@@ -1,0 +1,34 @@
+---
+import Layout from "../layouts/Layout.astro";
+import WhitespaceDemo from "../components/WhitespaceDemo.astro";
+---
+
+<Layout title="astro-strip-whitespace e2e">
+  <h1 class="mb-4 text-3xl font-bold">astro-strip-whitespace</h1>
+
+  <WhitespaceDemo />
+
+  <p>
+    <span>To preserve whitespace between items, you can use</span>
+    {" "}
+    <code>{'{" "}'}</code>
+    {" "}
+    <span>like in JSX/TSX.</span>
+  </p>
+
+  <p>
+    <span>Alternatively, you may use an HTML entity like</span>
+    &#32;
+    <code>&amp;#32;</code>
+    &#32;
+    <span>or</span>
+    &#32;
+    <code>&amp;#13;</code>
+    &#32;
+    <span>for a space or line break respectively.</span>
+  </p>
+
+  <footer>
+    <p>Build output should have stripped whitespace.</p>
+  </footer>
+</Layout>

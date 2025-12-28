@@ -1,0 +1,69 @@
+---
+const show = true;
+
+const groups = [
+  { label: "One", children: ["a", "b"] },
+  { label: "Two", children: ["c", "d"] },
+];
+
+// Dummy HTML-looking strings in frontmatter (should not be treated as markup)
+const dummyHtmlTight = "<div><span>no-space</span><span>tight</span></div>";
+const dummyHtmlSpaced = "<div> <span> spaced </span> <span> out </span> </div>";
+const dummyHtmlTemplate = `
+<section>
+  <p>line 1</p><p>line 2</p>
+  <div>  <span>  inner  </span> </div>
+</section>
+`;
+const dummyHtmlWithBraces = "<p>{notAnExpression}</p>";
+const dummyHtmlWithScript = "<script>const s = '</div>';</script>";
+
+const join = (a, b) => `${a}${b}`;
+---
+
+<div id="tight"><span>A</span><span>B</span><span>{1 + 2}</span></div
+
+><div id="spaced" 
+ ><span >A</span  
+ ><span >B</span 
+></div
+
+><div id="mixed" 
+ ><span>before</span>{" "}<span>after</span 
+ ><span>{join("x", "y")}</span
+></div
+
+><div id="comments" 
+ ><!-- HTML comment should be preserved as a node  
+ --><span>left</span>{show && <span>mid</span>}<span>right</span
+></div
+
+><p id="stringy" 
+ >{"<span>this is a string, not a tag</span>"
+}</p
+
+><ul id="nested" 
+ >{
+    groups.map((group) => (
+      <li 
+       ><strong>{group.label}</strong 
+
+       ><ul 
+         >{group.children.map((child) => (
+            <li 
+             >{show ? (
+                <Fragment 
+                 ><span class="child">{child}</span 
+                 ><span class="sep">|</span 
+                 >{child === "b" ? <em>last</em> : <b>mid</b> 
+               }</Fragment>
+              ) : (
+                <span>hidden</span>
+              ) 
+           }</li>
+          )) 
+       }</ul 
+     ></li>
+    ))
+  
+}</ul>
