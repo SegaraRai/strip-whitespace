@@ -25,12 +25,22 @@ export const unpluginFactory: UnpluginFactory<
     transform: {
       filter: {
         id: {
-          include: [/\.astro$/, /\.svelte$/, /\.vue$/],
+          include: [/\.astro$/],
           exclude: [/\?/],
         },
       },
       async handler(code, id) {
-        return strip_whitespace(code, id, stripOptions);
+        if (!id.endsWith(".astro") || id.includes("?")) {
+          return null;
+        }
+
+        const result = strip_whitespace(code, id, stripOptions);
+        if (result.code === code) {
+          // No changes
+          return null;
+        }
+
+        return result;
       },
     },
     vite: {
