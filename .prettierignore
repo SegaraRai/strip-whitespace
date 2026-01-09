@@ -3,3 +3,5 @@ tsconfig.json
 
 fixtures
 snapshots
+
+examples/e2e-astro/src/components

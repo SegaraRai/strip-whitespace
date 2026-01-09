@@ -1,7 +1,8 @@
-import stripWhitespace from "astro-strip-whitespace";
 import mdx from "@astrojs/mdx";
 import svelte from "@astrojs/svelte";
+import vue from "@astrojs/vue";
 import tailwindcss from "@tailwindcss/vite";
+import stripWhitespace from "astro-strip-whitespace";
 import { defineConfig } from "astro/config";
 import { env } from "node:process";
 
@@ -21,7 +22,7 @@ export default defineConfig({
   build: {
     format: "file",
   },
-  integrations: [svelte(), mdx(), ...integrations],
+  integrations: [svelte(), vue(), mdx(), ...integrations],
   vite: {
     plugins: [tailwindcss()],
   },

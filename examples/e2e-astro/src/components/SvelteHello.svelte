@@ -11,7 +11,6 @@
   not affect it.
 </p>
 
-<!-- prettier-ignore -->
 <p>
   Consecutive
     spaces

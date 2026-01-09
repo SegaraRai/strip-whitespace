@@ -1,0 +1,13 @@
+---
+import VueCounter from "../components/VueCounter.vue";
+import VueHello from "../components/VueHello.vue";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Vue demo">
+  <h1 class="mb-4 text-3xl font-bold">Vue demo</h1>
+
+  <VueHello name="Astro + Vue" client:load />
+
+  <VueCounter client:load />
+</Layout>
