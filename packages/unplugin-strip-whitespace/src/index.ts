@@ -12,13 +12,13 @@ export type { Language, StripWhitespaceOptions } from "./types";
 export function defaultLanguageSelector(
   id: string,
   _content: string,
-): Language | null {
+): Language | false {
   if (
     id.includes("?") ||
     id.includes("node_modules/") ||
     id.includes("node_modules\\")
   ) {
-    return null;
+    return false;
   }
 
   if (id.endsWith(".astro")) {
@@ -29,16 +29,16 @@ export function defaultLanguageSelector(
     return "svelte";
   }
 
-  return null;
+  return false;
 }
 
 function createLanguageSelectorFromArray(languages: readonly Language[]) {
-  return (id: string, content: string): Language | null => {
+  return (id: string, content: string): Language | false => {
     const lang = defaultLanguageSelector(id, content);
     if (lang && languages.includes(lang)) {
       return lang;
     }
-    return null;
+    return false;
   };
 }
 

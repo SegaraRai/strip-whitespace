@@ -10,11 +10,11 @@
 //!   deleted freely and upstream mappings would recover original locations.
 //! - In practice, sourcemaps may be unavailable, dropped, or not threaded through every step.
 //!   To reduce location drift in the stripped output, this module moves a small prefix/suffix
-//!   token across a whitespace-only gap (“rotation”) instead of deleting bytes outright.
+//!   token across a whitespace-only gap ("rotation") instead of deleting bytes outright.
 //!
 //! Definitions:
 //!
-//! - A “gap” is the byte range between adjacent named children of container nodes (`document` and
+//! - A "gap" is the byte range between adjacent named children of container nodes (`document` and
 //!   `element`) where the range is entirely whitespace.
 //!
 //! Transformations:
@@ -43,9 +43,9 @@ use crate::{
 /// Configuration options for whitespace stripping.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct StripConfig {
-    /// If true, preserves “section breaks” by skipping gaps that contain an empty line.
+    /// If true, preserves "section breaks" by skipping gaps that contain an empty line.
     ///
-    /// A “blank line” here is defined as two consecutive line breaks within the whitespace gap
+    /// A "blank line" here is defined as two consecutive line breaks within the whitespace gap
     /// (either `\n\n` or `\r\n\r\n`).
     pub preserve_blank_lines: bool,
 }

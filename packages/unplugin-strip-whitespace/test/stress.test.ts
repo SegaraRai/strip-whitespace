@@ -1,11 +1,11 @@
 import {
   initWasmOnce,
-  strip_whitespace,
-  strip_whitespace_no_sourcemap,
+  stripWhitespace,
+  stripWhitespaceNoSourcemap,
   type InitOutput,
 } from "#wasm";
 import { readFile } from "node:fs/promises";
-import { describe, expect, it } from "vitest";
+import { it } from "vitest";
 
 function getWasmMemoryBytes(initOutput: InitOutput): number | undefined {
   try {
@@ -15,76 +15,108 @@ function getWasmMemoryBytes(initOutput: InitOutput): number | undefined {
   }
 }
 
-describe("wasm stress", () => {
-  it("does not trap under repeated parsing", { timeout: 60_000 }, async () => {
+function getLanguageFromFilename(filename: string) {
+  const parts = filename.split(".");
+  const extension = parts[parts.length - 1];
+  const language = (
+    {
+      astro: "astro",
+      svelte: "svelte",
+    } as const
+  )[extension];
+
+  if (!language) {
+    throw new Error(`unsupported file extension: .${extension}`);
+  }
+
+  return language;
+}
+
+it.for([
+  ["../../../examples/e2e-astro/src/layouts/Layout.astro", 2000],
+  ["../../../fixtures/complex.astro", 750],
+  ["../../../examples/e2e-astro/src/components/SvelteCounter.svelte", 2000],
+  ["../../../fixtures/complex.svelte", 750],
+] as const)(
+  "wasm stress test: %s x %d",
+  { timeout: 60_000 },
+  async ([filepath, iterations], { expect }) => {
     const initOutput = initWasmOnce();
 
-    const layoutUrl = new URL(
-      "../../../examples/e2e-astro/src/layouts/Layout.astro",
-      import.meta.url,
+    const language = getLanguageFromFilename(filepath);
+
+    const fileURL = new URL(filepath, import.meta.url);
+    const input = await readFile(fileURL, "utf8");
+
+    const { code: baselineCode, map: baselineMap } = stripWhitespace(
+      input,
+      filepath,
+      language,
+      {
+        preserveBlankLines: false,
+      },
     );
-    const complexUrl = new URL(
-      "../../../fixtures/complex.astro",
-      import.meta.url,
-    );
+    expect(typeof baselineCode).toBe("string");
+    expect(typeof baselineMap).toBe("string");
 
-    const layout = await readFile(layoutUrl, "utf8");
-    const complex = await readFile(complexUrl, "utf8");
-
-    // These loops are intentionally high enough to catch the old wasm-only
-    // instability (which used to trap after just a handful of iterations).
-    for (const [name, input, iterations] of [
-      ["Layout.astro", layout, 2000],
-      ["complex.astro", complex, 750],
-    ] as const) {
-      const baseline = strip_whitespace_no_sourcemap(input, {
-        preserve_blank_lines: false,
-      });
-      expect(typeof baseline).toBe("string");
-
-      for (let i = 0; i < iterations; i++) {
-        let out: string;
-        try {
-          out = strip_whitespace_no_sourcemap(input, {
-            preserve_blank_lines: false,
-          });
-        } catch (error) {
-          const memBytes = getWasmMemoryBytes(initOutput);
-          throw new Error(
-            [
-              `wasm trap while stripping ${name} at iteration ${i}`,
-              `input.length=${input.length}`,
-              `wasm.memory.bytes=${memBytes ?? "unknown"}`,
-              `error=${String((error as any)?.stack ?? error)}`,
-            ].join("\n"),
-          );
-        }
-        if (out !== baseline) {
-          throw new Error(
-            `non-deterministic output for ${name} at iteration ${i}`,
-          );
-        }
-      }
-
-      // Also exercise preserveBlankLines=true; we only care that it never traps.
-      for (let i = 0; i < Math.min(200, iterations); i++) {
-        const out = strip_whitespace_no_sourcemap(input, {
-          preserve_blank_lines: true,
+    for (let i = 0; i < iterations; i++) {
+      let out;
+      try {
+        out = stripWhitespace(input, filepath, language, {
+          preserveBlankLines: false,
         });
-        expect(typeof out).toBe("string");
+      } catch (error) {
+        const memBytes = getWasmMemoryBytes(initOutput);
+        throw new Error(
+          [
+            `wasm trap while stripping ${filepath} at iteration ${i}`,
+            `input.length=${input.length}`,
+            `wasm.memory.bytes=${memBytes ?? "unknown"}`,
+            `error=${String((error as any)?.stack ?? error)}`,
+          ].join("\n"),
+        );
+      }
+      if (out.code !== baselineCode || out.map !== baselineMap) {
+        throw new Error(
+          `non-deterministic output for ${filepath} at iteration ${i}`,
+        );
+      }
+
+      let out2;
+      try {
+        out2 = stripWhitespaceNoSourcemap(input, language, {
+          preserveBlankLines: false,
+        });
+      } catch (error) {
+        const memBytes = getWasmMemoryBytes(initOutput);
+        throw new Error(
+          [
+            `wasm trap while stripping (no sourcemap) ${filepath} at iteration ${i}`,
+            `input.length=${input.length}`,
+            `wasm.memory.bytes=${memBytes ?? "unknown"}`,
+            `error=${String((error as any)?.stack ?? error)}`,
+          ].join("\n"),
+        );
+      }
+      if (out2 !== baselineCode) {
+        throw new Error(
+          `non-deterministic output (no sourcemap) for ${filepath} at iteration ${i}`,
+        );
       }
     }
 
-    // Exercise the wasm output object + free() path too.
-    for (let i = 0; i < 250; i++) {
-      const out = strip_whitespace(layout, "Layout.astro", {
-        preserve_blank_lines: false,
+    // Also exercise preserveBlankLines=true; we only care that it never traps.
+    for (let i = 0; i < iterations; i++) {
+      const out = stripWhitespace(input, filepath, language, {
+        preserveBlankLines: true,
       });
-
       expect(typeof out.code).toBe("string");
-      expect(typeof out.sourcemap).toBe("string");
-      // Ensure sourcemap is valid JSON.
-      JSON.parse(out.sourcemap);
+      expect(typeof out.map).toBe("string");
+
+      const out2 = stripWhitespaceNoSourcemap(input, language, {
+        preserveBlankLines: true,
+      });
+      expect(typeof out2).toBe("string");
     }
-  });
-});
+  },
+);

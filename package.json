@@ -3,7 +3,7 @@
   "name": "strip-whitespace-workspace",
   "type": "module",
   "scripts": {
-    "test": "pnpm -r test",
+    "test": "vitest",
     "build": "pnpm build:wasm && pnpm build:plugin",
     "build:e2e-astro": "pnpm --filter strip-whitespace-e2e-astro run build",
     "build:plugin": "pnpm run build:plugin-unplugin && pnpm run build:plugin-astro",

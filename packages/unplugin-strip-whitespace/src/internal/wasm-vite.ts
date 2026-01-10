@@ -12,7 +12,7 @@ export function initWasmOnce(): InitOutput {
     // This is not the case when bundling with esbuild since strip-whitespace-wasm is a private
     // package and therefore we need to bundle the wasm file directly.
     const wasmPath = createRequire(import.meta.url).resolve(
-      "strip-whitespace-wasm/index_bg.wasm",
+      "strip-whitespace-wasm/wasm",
     );
     const wasm = readFileSync(wasmPath);
     initOutput = initSync({ module: wasm });

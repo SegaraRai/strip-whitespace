@@ -16,7 +16,7 @@ export interface StripWhitespaceOptions {
    */
   selectLanguage?:
     | readonly Language[]
-    | ((id: string, content: string) => Language | null)
+    | ((id: string, content: string) => Language | false)
     | undefined;
 
   /**
@@ -32,7 +32,7 @@ export interface StripWhitespaceOptions {
   /**
    * A regular expression to match Vite plugins before which the strip-whitespace plugin should be moved.
    * If set to `false`, the plugin will not be moved.
-   * Default is to move before plugins that handle Astro files.
+   * Default is to move before plugins that handle Astro or Svelte files.
    *
    * @default /^astro:build|^vite-plugin-svelte$/
    */

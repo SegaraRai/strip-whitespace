@@ -1,5 +1,5 @@
 import { initSync, type InitOutput } from "strip-whitespace-wasm";
-import wasmPath from "strip-whitespace-wasm/index_bg.wasm";
+import wasmPath from "strip-whitespace-wasm/wasm";
 import { readFileSync } from "node:fs";
 
 export * from "strip-whitespace-wasm";

@@ -1,6 +1,7 @@
 {
   "name": "astro-strip-whitespace",
   "version": "0.1.0",
+  "keywords": ["astro-integration"],
   "private": true,
   "type": "module",
   "main": "./dist/index.mjs",
