@@ -1,5 +1,7 @@
 node_modules
 
+.claude
+
 .astro
 dist
 target

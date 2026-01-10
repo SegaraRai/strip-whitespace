@@ -1,7 +1,6 @@
 {
   "name": "unplugin-strip-whitespace",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
