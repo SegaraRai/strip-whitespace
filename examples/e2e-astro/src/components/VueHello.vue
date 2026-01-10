@@ -17,18 +17,18 @@ const displayName = computed(() => props.name ?? "Vue");
   </p>
 
   <p>
-    Vue has own whitespace handling so Astro's strip-whitespace feature should
-    not affect it.
+    We currently DON'T support stripping whitespace in Vue components.
   </p>
 
   <p>
-    Consecutive
-      spaces
-        and
-          new
-            lines
-              should
-                be
-                  preserved.
+    Vue
+      does
+        not
+          preserve
+            consecutive
+              spaces
+                in
+                  text
+                    nodes.
   </p>
 </template>

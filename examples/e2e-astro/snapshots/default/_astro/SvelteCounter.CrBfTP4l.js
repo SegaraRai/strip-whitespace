@@ -1,0 +1,1 @@
+import"./legacy.DqdqzNL1.js";import{h as r,t as u,u as c,k as l,n as m,r as f,q as i,a,v as p,s as v}from"./render.BPxthj4-.js";var b=r('<button type="button"> </button>');function h(o){let e=p(0);function n(){v(e,a(e)+1)}var t=b(),s=m(t);f(t),u(()=>i(s,`Count:${a(e)??""}`)),c("click",t,n),l(o,t)}export{h as default};

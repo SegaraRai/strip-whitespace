@@ -3,12 +3,32 @@ use std::{fs, path::PathBuf};
 use clap::Parser;
 use tree_sitter::Parser as TsParser;
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, clap::ValueEnum)]
+pub enum Language {
+    Astro,
+    Svelte,
+}
+
+impl Language {
+    pub fn from_extension(ext: &str) -> Option<Self> {
+        match ext {
+            "astro" => Some(Language::Astro),
+            "svelte" => Some(Language::Svelte),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Parser, Debug)]
-#[command(name = "parse-astro")]
-#[command(about = "Parse an .astro file with tree-sitter-astro and print the CST", long_about = None)]
+#[command(name = "parse")]
+#[command(about = "Parse a source file with tree-sitter and print the CST", long_about = None)]
 struct Args {
-    /// Path to the .astro file to parse
+    /// Path to the source file to parse
     input: PathBuf,
+
+    /// Override language instead of inferring from file extension
+    #[arg(long, short)]
+    language: Option<Language>,
 
     /// Print the tree in S-expression format instead of the default dump format
     #[arg(long, short)]
@@ -18,11 +38,30 @@ struct Args {
 fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let args = Args::parse();
 
+    let language = if let Some(lang) = &args.language {
+        *lang
+    } else if let Some(ext) = args.input.extension().and_then(|e| e.to_str()) {
+        Language::from_extension(ext).ok_or_else(|| {
+            std::io::Error::other(format!(
+                "could not infer language from file extension: .{}",
+                ext
+            ))
+        })?
+    } else {
+        return Err(std::io::Error::other(
+            "could not infer language: no file extension and --language not provided",
+        )
+        .into());
+    };
+
     let source = fs::read_to_string(&args.input)?;
 
     let mut parser = TsParser::new();
-    let language = tree_sitter_astro::LANGUAGE;
-    parser.set_language(&language.into())?;
+    let language_fn = match language {
+        Language::Astro => tree_sitter_astro::LANGUAGE,
+        Language::Svelte => tree_sitter_svelte_ng::LANGUAGE,
+    };
+    parser.set_language(&language_fn.into())?;
 
     let tree = parser
         .parse(&source, None)

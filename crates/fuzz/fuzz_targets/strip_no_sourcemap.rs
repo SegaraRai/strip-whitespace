@@ -1,7 +1,7 @@
 #![no_main]
 
 use libfuzzer_sys::fuzz_target;
-use strip_whitespace::strip::{StripConfig, strip_astro_whitespace_no_sourcemap};
+use strip_whitespace::{Language, StripConfig, strip_whitespace_no_sourcemap};
 
 fuzz_target!(|data: &[u8]| {
     // Limit input size to keep the fuzzer fast and avoid OOM in pathological cases.
@@ -15,16 +15,16 @@ fuzz_target!(|data: &[u8]| {
 
     // Exercise both configuration modes for every input.
     // Parse errors are expected outcomes and must never crash.
-    let _ = strip_astro_whitespace_no_sourcemap(
-        &source,
-        &StripConfig {
-            preserve_blank_lines: false,
-        },
-    );
-    let _ = strip_astro_whitespace_no_sourcemap(
-        &source,
-        &StripConfig {
-            preserve_blank_lines: true,
-        },
-    );
+    for &language in &[Language::Astro, Language::Svelte] {
+        for config in &[
+            StripConfig {
+                preserve_blank_lines: false,
+            },
+            StripConfig {
+                preserve_blank_lines: true,
+            },
+        ] {
+            let _ = strip_whitespace_no_sourcemap(&source, language, config);
+        }
+    }
 });

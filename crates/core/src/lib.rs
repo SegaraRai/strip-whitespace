@@ -1,6 +1,6 @@
-//! Astro whitespace stripping library (with WASM bindings).
+//! Whitespace stripping library for template languages (Astro, Svelte, etc.).
 //!
-//! This crate provides a whitespace stripper for Astro that focuses on removing inter-node
+//! This crate provides a whitespace stripper that focuses on removing inter-node
 //! whitespace gaps while keeping mappings predictable.
 //!
 //! Entry points:
@@ -20,11 +20,23 @@ pub mod parse;
 pub mod strip;
 pub mod utf16;
 
+pub use strip::{CodeAndSourcemap, StripConfig, strip_whitespace, strip_whitespace_no_sourcemap};
+
+/// Supported template languages for whitespace stripping.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Language {
+    Astro,
+    Svelte,
+}
+
 /// Errors that can occur during stripping.
 #[derive(thiserror::Error, Debug)]
 pub enum StripError {
     #[error("tree-sitter failed to parse input")]
     ParseFailed,
+
+    #[error("unsupported language")]
+    UnsupportedLanguage,
 
     #[error("invalid edit: {0}")]
     InvalidEdit(String),

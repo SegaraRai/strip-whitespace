@@ -1,0 +1,1 @@
+{"version":3,"sources":["simple.svelte"],"sourcesContent":["<script>\n  let name = \"Svelte\";\n  let result = 2 + 3;\n</script>\n\n<div class=\"container\">\n  <h1>Hello {name}</h1>\n  <p>2 + 3 = {result}</p>\n</div>\n"],"names":[],"mappings":"AAAA;AACA;AACA;AACA;AACA;AACA,sBACC;AAAD,CADsB,CACpB,SAAU,WACX;AAAD,CADsB,CACpB,UAAW,YAAY;AAAD,CACxB"}

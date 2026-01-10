@@ -7,4 +7,7 @@ export default defineConfig({
       ".wasm": "asset",
     },
   },
+  attw: {
+    profile: "esm-only",
+  },
 });

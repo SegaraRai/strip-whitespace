@@ -7,17 +7,15 @@
 </p>
 
 <p>
-  Svelte has own whitespace handling so Astro's strip-whitespace feature should
-  not affect it.
+  We support stripping whitespace in Svelte components.
 </p>
 
 <p>
-  Consecutive
-    spaces
-      and
-        new
-          lines
-            should
-              be
-                preserved.
+  Svelte
+    preserves
+      consecutive
+        spaces
+          in
+            text
+              nodes.
 </p>

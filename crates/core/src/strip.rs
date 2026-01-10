@@ -35,9 +35,9 @@
 //!   origin map so sourcemaps can be created or rewritten.
 
 use crate::{
-    StripError,
+    Language, StripError,
     edit::{Edit, create_sourcemap, validate_edits},
-    parse::parse_astro,
+    parse::parse,
 };
 
 /// Configuration options for whitespace stripping.
@@ -56,45 +56,51 @@ pub struct CodeAndSourcemap {
     /// The rewritten Astro source.
     pub code: String,
     /// The generated/re-written sourcemap JSON.
-    pub sourcemap: String,
+    pub map: String,
 }
 
 /// Strip inter-node whitespace and create a brand-new sourcemap.
 ///
 /// This exists so callers can still obtain a sourcemap even if upstream tooling does not emit
 /// one. The returned sourcemap maps the stripped output back to `source`.
-pub fn strip_astro_whitespace(
+pub fn strip_whitespace(
     source: &str,
     source_filename: &str,
+    language: Language,
     config: &StripConfig,
 ) -> Result<CodeAndSourcemap, StripError> {
-    let (code, edits) = rewrite(source, config)?;
-    let sourcemap = create_sourcemap(source, &code, source_filename, &edits)?;
-    Ok(CodeAndSourcemap { code, sourcemap })
+    let (code, edits) = rewrite(source, language, config)?;
+    let map = create_sourcemap(source, &code, source_filename, &edits)?;
+    Ok(CodeAndSourcemap { code, map })
 }
 
 /// Strip inter-node whitespace without producing a sourcemap.
 ///
 /// This is the cheapest entry point if you don't need mappings.
-pub fn strip_astro_whitespace_no_sourcemap(
+pub fn strip_whitespace_no_sourcemap(
     source: &str,
+    language: Language,
     config: &StripConfig,
 ) -> Result<String, StripError> {
-    let (code, _) = rewrite(source, config)?;
+    let (code, _) = rewrite(source, language, config)?;
     Ok(code)
 }
 
 /// Parse `source`, collect non-overlapping edits, apply them, and return `(output, edits)`.
 ///
 /// This is the shared core used by all public entry points.
-fn rewrite(source: &str, config: &StripConfig) -> Result<(String, Vec<Edit>), StripError> {
+fn rewrite(
+    source: &str,
+    language: Language,
+    config: &StripConfig,
+) -> Result<(String, Vec<Edit>), StripError> {
     let src = source.as_bytes();
 
-    let tree = parse_astro(source)?;
+    let tree = parse(source, language)?;
     let root = tree.root_node();
 
     // Collect edits by walking the CST.
-    let edits = collect_edits(source, root, config);
+    let edits = collect_edits(source, root, language, config);
 
     // Validate edits for overlaps.
     validate_edits(src.len(), &edits)?;
@@ -125,9 +131,12 @@ fn rewrite(source: &str, config: &StripConfig) -> Result<(String, Vec<Edit>), St
 /// Walk the parsed AST and collect whitespace-gap rewrite edits.
 ///
 /// Returns a sorted list of edits to apply to `source`.
-fn collect_edits(source: &str, node: tree_sitter::Node<'_>, config: &StripConfig) -> Vec<Edit> {
-    let mut edits: Vec<Edit> = Vec::new();
-
+fn collect_edits(
+    source: &str,
+    node: tree_sitter::Node<'_>,
+    language: Language,
+    config: &StripConfig,
+) -> Vec<Edit> {
     // Iterative traversal that uses a TreeCursor and never indexes children by integer.
     //
     // This avoids:
@@ -135,13 +144,15 @@ fn collect_edits(source: &str, node: tree_sitter::Node<'_>, config: &StripConfig
     // - huge Vec growth on wide nodes (push-all-children approaches)
     // - wasm panics where `child_count`/`child(i)` can disagree for some nodes
     //
-    // We only apply gap edits to “container” nodes (`document` and `element`). We intentionally
-    // do NOT treat `html_interpolation` as a container because whitespace within `{ ... }` is
-    // part of JavaScript and can be semantically meaningful.
+    // We only apply gap edits to "container" nodes. For Astro: `document` and `element`.
+    // For Svelte: `fragment` and `element`. We intentionally do NOT treat interpolation/expression
+    // nodes as containers because whitespace within `{ ... }` is part of JavaScript and can be
+    // semantically meaningful.
 
     fn process_container_gaps(
         source: &str,
         node: tree_sitter::Node<'_>,
+        language: Language,
         config: &StripConfig,
         edits: &mut Vec<Edit>,
     ) {
@@ -174,7 +185,7 @@ fn collect_edits(source: &str, node: tree_sitter::Node<'_>, config: &StripConfig
 
             // Case 1: rotate a trailing delimiter from the previous node (">", "/>", "-->", "}")
             // to sit immediately before the next node.
-            if let Some(delim) = TrailingDelim::from_node(prev) {
+            if let Some(delim) = TrailingDelim::from_node(prev, language) {
                 let delim_len = delim.len();
                 if prev.end_byte() >= delim_len {
                     let delim_pos = prev.end_byte() - delim_len;
@@ -203,7 +214,7 @@ fn collect_edits(source: &str, node: tree_sitter::Node<'_>, config: &StripConfig
             // ("<!--", "<tag", "</tag", "{"), rotate that opener left across the gap so it
             // becomes adjacent to the text.
             if prev.kind() == "text"
-                && let Some(prefix_end) = opener_prefix_end(source, next)
+                && let Some(prefix_end) = opener_prefix_end(source, next, language)
                 && prefix_end > gap_end
             {
                 let prefix = &source.as_bytes()[gap_end..prefix_end];
@@ -225,12 +236,33 @@ fn collect_edits(source: &str, node: tree_sitter::Node<'_>, config: &StripConfig
         }
     }
 
+    // Determine which node kinds are containers based on the language
+    fn is_container(kind: &str, language: Language) -> bool {
+        matches!(
+            (language, kind),
+            (Language::Astro, "document" | "element")
+                | (
+                    Language::Svelte,
+                    "document"
+                        | "fragment"
+                        | "element"
+                        | "if_statement"
+                        | "each_statement"
+                        | "await_statement"
+                        | "key_statement"
+                        | "else_block"
+                        | "else_if_block"
+                )
+        )
+    }
+
+    let mut edits: Vec<Edit> = Vec::new();
     let mut cursor = node.walk();
     'walk: loop {
         let current = cursor.node();
         let kind = current.kind();
-        if kind == "document" || kind == "element" {
-            process_container_gaps(source, current, config, &mut edits);
+        if is_container(kind, language) {
+            process_container_gaps(source, current, language, config, &mut edits);
         }
 
         // Descend if possible.
@@ -289,60 +321,109 @@ impl TrailingDelim {
     /// Attempts to infer the delimiter type that ends `node`.
     ///
     /// For `element`, we inspect its last named child to find the real trailing token.
-    fn from_node(node: tree_sitter::Node<'_>) -> Option<Self> {
-        match node.kind() {
-            "start_tag" | "end_tag" => Some(TrailingDelim::Gt),
-            "self_closing_tag" => Some(TrailingDelim::SlashGt),
-            "comment" => Some(TrailingDelim::CommentEnd),
-            "html_interpolation" => Some(TrailingDelim::RBrace),
-            "element" => {
+    fn from_node(node: tree_sitter::Node<'_>, language: Language) -> Option<Self> {
+        match (language, node.kind()) {
+            (_, "start_tag" | "end_tag") => Some(TrailingDelim::Gt),
+            (_, "self_closing_tag") => Some(TrailingDelim::SlashGt),
+            (_, "comment") => Some(TrailingDelim::CommentEnd),
+            (Language::Astro, "html_interpolation") => Some(TrailingDelim::RBrace),
+            (Language::Svelte, "expression") => Some(TrailingDelim::RBrace),
+            // Svelte control flow blocks end with }
+            (
+                Language::Svelte,
+                "if_start" | "else_if_start" | "if_end" | "each_start" | "each_end" | "await_start"
+                | "await_end" | "key_start" | "key_end" | "else_start",
+            ) => Some(TrailingDelim::RBrace),
+            (_, "element") => {
                 // Find the actual trailing delimiter from the element's last child.
                 let mut cursor = node.walk();
                 let last_child = node.named_children(&mut cursor).last()?;
-                TrailingDelim::from_node(last_child)
+                TrailingDelim::from_node(last_child, language)
+            }
+            // Svelte statements end with their end tags
+            (
+                Language::Svelte,
+                "if_statement" | "each_statement" | "await_statement" | "key_statement",
+            ) => {
+                // Find the actual trailing delimiter from the statement's last child.
+                let mut cursor = node.walk();
+                let last_child = node.named_children(&mut cursor).last()?;
+                TrailingDelim::from_node(last_child, language)
+            }
+            // else_block ends with its last child's delimiter
+            (Language::Svelte, "else_block" | "else_if_block") => {
+                let mut cursor = node.walk();
+                let last_child = node.named_children(&mut cursor).last()?;
+                TrailingDelim::from_node(last_child, language)
             }
             _ => None,
         }
     }
 }
 
-/// Returns the byte offset of the end of the “opener prefix” for `next`.
+/// Returns the byte offset of the end of the "opener prefix" for `next`.
 ///
-/// This is used for the “rotate opener prefix left” transformation.
+/// This is used for the "rotate opener prefix left" transformation.
 ///
 /// Examples (prefixes moved):
 ///
 /// - `comment`: `<!--`
-/// - `html_interpolation`: `{`
+/// - `html_interpolation` (Astro) / `expression` (Svelte): `{`
 /// - `start_tag`/`end_tag`/`self_closing_tag`: `<tagname` (up through the `tag_name` node)
-fn opener_prefix_end(source: &str, next: tree_sitter::Node<'_>) -> Option<usize> {
+fn opener_prefix_end(
+    source: &str,
+    next: tree_sitter::Node<'_>,
+    language: Language,
+) -> Option<usize> {
     let start = next.start_byte();
     let bytes = source.as_bytes();
 
-    match next.kind() {
-        "html_interpolation" => {
+    match (language, next.kind()) {
+        // Astro uses "html_interpolation", Svelte uses "expression"
+        (Language::Astro, "html_interpolation") | (Language::Svelte, "expression") => {
             if bytes.get(start) == Some(&b'{') {
                 Some(start + 1)
             } else {
                 None
             }
         }
-        "comment" => {
+        // Svelte control flow blocks: `{#if}`, `{#each}`, `{:else}`, `{/if}`, etc.
+        (
+            Language::Svelte,
+            "if_start" | "else_if_start" | "else_start" | "if_end" | "each_start" | "each_end"
+            | "await_start" | "await_end" | "key_start" | "key_end",
+        ) => {
+            if bytes.get(start) == Some(&b'{') {
+                Some(start + 1)
+            } else {
+                None
+            }
+        }
+        (_, "comment") => {
             if bytes.get(start..start + 4) == Some(b"<!--") {
                 Some(start + 4)
             } else {
                 None
             }
         }
-        "element" => {
+        (_, "element") => {
             // Move "<" + tag_name for the element's start tag.
             let mut cursor = next.walk();
             let tag = next
                 .named_children(&mut cursor)
                 .find(|c| c.kind() == "start_tag" || c.kind() == "self_closing_tag")?;
-            opener_prefix_end(source, tag)
+            opener_prefix_end(source, tag, language)
         }
-        "start_tag" | "end_tag" | "self_closing_tag" => {
+        // Svelte statements: move the opening "{" from the first child
+        (
+            Language::Svelte,
+            "if_statement" | "each_statement" | "await_statement" | "key_statement",
+        ) => {
+            let mut cursor = next.walk();
+            let first_child = next.named_children(&mut cursor).next()?;
+            opener_prefix_end(source, first_child, language)
+        }
+        (_, "start_tag" | "end_tag" | "self_closing_tag") => {
             if bytes.get(start) != Some(&b'<') {
                 return None;
             }
@@ -360,7 +441,7 @@ fn opener_prefix_end(source: &str, next: tree_sitter::Node<'_>) -> Option<usize>
     }
 }
 
-/// Returns true if a whitespace-only gap contains a “blank line”.
+/// Returns true if a whitespace-only gap contains a "blank line".
 ///
 /// A blank line is defined as two consecutive line breaks (`\n\n` or `\r\n\r\n`).
 fn contains_blank_line(ws: &str) -> bool {
@@ -520,17 +601,53 @@ fn rotate_prefix_over_gap(prefix: &[u8], gap: &str) -> (String, Vec<usize>) {
 mod tests {
     use super::*;
 
-    /// Strips whitespace using the default config.
-    fn strip(src: &str) -> String {
-        strip_astro_whitespace_no_sourcemap(src, &StripConfig::default()).unwrap()
+    /// Strips whitespace using the default config for Astro.
+    fn strip_astro(src: &str) -> String {
+        strip_whitespace_no_sourcemap(src, Language::Astro, &StripConfig::default()).unwrap()
     }
 
-    /// Strips whitespace using a custom `preserve_blank_lines` setting.
-    fn strip_cfg(src: &str, preserve_blank_lines: bool) -> String {
+    /// Strips whitespace using a custom `preserve_blank_lines` setting for Astro.
+    fn strip_astro_cfg(src: &str, preserve_blank_lines: bool) -> String {
         let cfg = StripConfig {
             preserve_blank_lines,
         };
-        strip_astro_whitespace_no_sourcemap(src, &cfg).unwrap()
+        strip_whitespace_no_sourcemap(src, Language::Astro, &cfg).unwrap()
+    }
+
+    /// Strips whitespace using the default config for Svelte.
+    fn strip_svelte(src: &str) -> String {
+        strip_whitespace_no_sourcemap(src, Language::Svelte, &StripConfig::default()).unwrap()
+    }
+
+    /// Strips whitespace using a custom `preserve_blank_lines` setting for Svelte.
+    fn strip_svelte_cfg(src: &str, preserve_blank_lines: bool) -> String {
+        let cfg = StripConfig {
+            preserve_blank_lines,
+        };
+        strip_whitespace_no_sourcemap(src, Language::Svelte, &cfg).unwrap()
+    }
+
+    /// Strips whitespace for both Astro and Svelte, asserting they produce the same result.
+    /// Use this for tests where behavior should be identical across languages.
+    fn strip_all(src: &str) -> String {
+        let astro_out = strip_astro(src);
+        let svelte_out = strip_svelte(src);
+        assert_eq!(
+            astro_out, svelte_out,
+            "Astro (left) and Svelte (right) produced different outputs for the same input with config.\n input: {src:?}"
+        );
+        astro_out
+    }
+
+    /// Strips whitespace for both languages with config, asserting they produce the same result.
+    fn strip_all_cfg(src: &str, preserve_blank_lines: bool) -> String {
+        let astro_out = strip_astro_cfg(src, preserve_blank_lines);
+        let svelte_out = strip_svelte_cfg(src, preserve_blank_lines);
+        assert_eq!(
+            astro_out, svelte_out,
+            "Astro (left) and Svelte (right) produced different outputs for the same input with config.\n input: {src:?}"
+        );
+        astro_out
     }
 
     /// Asserts that `map` is a permutation of `0..map.len()`.
@@ -578,13 +695,29 @@ mod tests {
         assert_is_permutation(&map);
     }
 
-    /// Creates a sourcemap when no input sourcemap is provided.
+    /// Creates a sourcemap (Astro).
     #[test]
-    fn emits_sourcemap_without_input() {
+    fn astro_emits_sourcemap() {
         let src = "<div>\n  <span>ok</span>\n</div>\n";
-        let res = strip_astro_whitespace(src, "input.astro", &StripConfig::default()).unwrap();
-        let sm = sourcemap::SourceMap::from_slice(res.sourcemap.as_bytes()).unwrap();
+        let res =
+            strip_whitespace(src, "input.astro", Language::Astro, &StripConfig::default()).unwrap();
+        let sm = sourcemap::SourceMap::from_slice(res.map.as_bytes()).unwrap();
         assert_eq!(sm.get_source(0), Some("input.astro"));
+    }
+
+    /// Creates a sourcemap (Svelte).
+    #[test]
+    fn svelte_emits_sourcemap() {
+        let src = "<div>\n  <span>ok</span>\n</div>\n";
+        let res = strip_whitespace(
+            src,
+            "input.svelte",
+            Language::Svelte,
+            &StripConfig::default(),
+        )
+        .unwrap();
+        let sm = sourcemap::SourceMap::from_slice(res.map.as_bytes()).unwrap();
+        assert_eq!(sm.get_source(0), Some("input.svelte"));
     }
 
     /// Rotates an opener prefix (`{`) left over a gap.
@@ -605,19 +738,19 @@ mod tests {
         assert!(!contains_blank_line("\n  \n"));
     }
 
-    /// End-tag delimiter rotation steals indentation when available.
+    /// End-tag delimiter rotation steals indentation when available (both languages).
     #[test]
     fn rewrite_rotates_gt_before_text_with_indent_steal() {
         let src = "<span>\n  text</span>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<span \n >text</span>");
     }
 
-    /// End-tag delimiter rotation without indentation.
+    /// End-tag delimiter rotation without indentation (both languages).
     #[test]
     fn rewrite_rotates_gt_before_text_without_indent() {
         let src = "<span>\ntext</span>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<span\n>text</span>");
     }
 
@@ -625,7 +758,7 @@ mod tests {
     #[test]
     fn rewrite_rotates_rbrace_before_next_node() {
         let src = "{a}\n  <b/>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "{a \n }<b/>");
     }
 
@@ -633,18 +766,15 @@ mod tests {
     #[test]
     fn rewrite_rotates_comment_end_before_next_node() {
         let src = "<!--c-->\n  <span/>";
-        let out = strip(src);
-        // Ensure we didn't corrupt the comment end delimiter.
-        assert!(out.contains("--><span"));
-        assert!(out.contains("-->"));
+        let out = strip_all(src);
+        assert_eq!(out, "<!--c \n --><span/>");
     }
 
     /// `<tagname` opener prefix rotation after text.
     #[test]
     fn rewrite_rotates_tag_prefix_left_after_text() {
         let src = "hi\n  <span/>";
-        let out = strip(src);
-        // Prefix is "<span" moved left; whitespace remains after it.
+        let out = strip_all(src);
         assert_eq!(out, "hi<span\n  />");
     }
 
@@ -652,7 +782,7 @@ mod tests {
     #[test]
     fn rewrite_rotates_comment_prefix_left_after_text() {
         let src = "hi\n  <!--c-->";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "hi<!--\n  c-->");
     }
 
@@ -660,7 +790,7 @@ mod tests {
     #[test]
     fn rewrite_rotates_interpolation_prefix_left_after_text() {
         let src = "hi\n  {a}";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "hi{\n  a}");
     }
 
@@ -668,11 +798,11 @@ mod tests {
     #[test]
     fn rewrite_does_not_preserve_blank_line_gaps_by_default() {
         let src = "<a></a>\n\n<b/>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_ne!(out, src);
 
         let src_crlf = "<a></a>\r\n\r\n<b/>";
-        let out_crlf = strip(src_crlf);
+        let out_crlf = strip_all(src_crlf);
         assert_ne!(out_crlf, src_crlf);
     }
 
@@ -680,19 +810,19 @@ mod tests {
     #[test]
     fn rewrite_preserves_blank_line_gaps_with_config() {
         let src = "<a></a>\n\n<b/>";
-        let out = strip_cfg(src, true);
+        let out = strip_all_cfg(src, true);
         assert_eq!(out, src);
 
         let src_crlf = "<a></a>\r\n\r\n<b/>";
-        let out_crlf = strip_cfg(src_crlf, true);
+        let out_crlf = strip_all_cfg(src_crlf, true);
         assert_eq!(out_crlf, src_crlf);
     }
 
-    /// Whitespace inside `{ ... }` interpolation expressions is preserved.
+    /// Whitespace inside `{ ... }` interpolation expressions is preserved (both languages).
     #[test]
     fn rewrite_does_not_touch_whitespace_inside_interpolation_expression() {
         let src = "{ a +  b }";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, src);
     }
 
@@ -700,7 +830,7 @@ mod tests {
     #[test]
     fn end_tag_then_start_tag() {
         let src = "<a>x</a>\n  <b></b>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a>x</a \n ><b></b>");
     }
 
@@ -708,7 +838,7 @@ mod tests {
     #[test]
     fn end_tag_then_self_closing_tag() {
         let src = "<a>x</a>\n  <b/>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a>x</a \n ><b/>");
     }
 
@@ -716,7 +846,7 @@ mod tests {
     #[test]
     fn end_tag_then_start_interpolation() {
         let src = "<a>x</a>\n  {b}";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a>x</a \n >{b}");
     }
 
@@ -724,7 +854,7 @@ mod tests {
     #[test]
     fn end_tag_then_text() {
         let src = "<a>x</a>\n  text";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a>x</a \n >text");
     }
 
@@ -732,7 +862,7 @@ mod tests {
     #[test]
     fn self_closing_tag_then_start_tag() {
         let src = "<a/>\n  <b>y</b>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a  \n/><b>y</b>");
     }
 
@@ -740,7 +870,7 @@ mod tests {
     #[test]
     fn self_closing_tag_then_self_closing_tag() {
         let src = "<a/>\n  <b/>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a  \n/><b/>");
     }
 
@@ -748,7 +878,7 @@ mod tests {
     #[test]
     fn self_closing_tag_then_start_interpolation() {
         let src = "<a/>\n  {b}";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a  \n/>{b}");
     }
 
@@ -756,7 +886,7 @@ mod tests {
     #[test]
     fn self_closing_tag_then_text() {
         let src = "<a/>\n  text";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "<a  \n/>text");
     }
 
@@ -764,7 +894,7 @@ mod tests {
     #[test]
     fn end_interpolation_then_start_tag() {
         let src = "{a}\n  <b>y</b>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "{a \n }<b>y</b>");
     }
 
@@ -772,7 +902,7 @@ mod tests {
     #[test]
     fn end_interpolation_then_self_closing_tag() {
         let src = "{a}\n  <b/>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "{a \n }<b/>");
     }
 
@@ -780,7 +910,7 @@ mod tests {
     #[test]
     fn end_interpolation_then_start_interpolation() {
         let src = "{a}\n  {b}";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "{a \n }{b}");
     }
 
@@ -788,7 +918,7 @@ mod tests {
     #[test]
     fn end_interpolation_then_text() {
         let src = "{a}\n  text";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "{a \n }text");
     }
 
@@ -796,7 +926,7 @@ mod tests {
     #[test]
     fn text_then_start_tag() {
         let src = "hi\n  <b>y</b>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "hi<b\n  >y</b>");
     }
 
@@ -804,7 +934,7 @@ mod tests {
     #[test]
     fn text_then_self_closing_tag() {
         let src = "hi\n  <b/>";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, "hi<b\n  />");
     }
 
@@ -814,7 +944,94 @@ mod tests {
         // Even if tree-sitter ever produces adjacent text nodes, we must not
         // strip whitespace between them. This is a simple no-op sanity check.
         let src = "hi\n  there";
-        let out = strip(src);
+        let out = strip_all(src);
         assert_eq!(out, src);
+    }
+
+    // Astro-specific tests
+
+    /// Astro JSX-like nested interpolations.
+    #[test]
+    fn astro_nested_interpolations() {
+        let src = "<ul>\n  { items.map(item => (\n    <li> {item} </li>\n  )) }\n</ul>";
+        let exp = "<ul \n >{ items.map(item => (\n    <li >{item }</li>\n  )) \n}</ul>";
+        let out = strip_astro(src);
+        assert_eq!(out, exp);
+    }
+
+    // Astro JSX-like conditional rendering.
+    #[test]
+    fn astro_conditional_rendering() {
+        let src = "<div>\n  { show ?\n    <span>\n      yes\n    </span> :\n    <span>\n      no\n    </span>\n  }\n</div>";
+        let exp = "<div \n >{ show ?\n    <span \n     >yes</span\n    > :\n    <span \n     >no</span\n    >\n  \n}</div>";
+        let out = strip_astro(src);
+        assert_eq!(out, exp);
+    }
+
+    // Svelte-specific tests
+
+    /// Svelte `{#each}` block with whitespace around opening and closing tags.
+    #[test]
+    fn svelte_each_block_strips_whitespace() {
+        let src = "<ul>\n  {#each items as item}\n    <li>{item}</li>\n  {/each}\n</ul>";
+        let exp = "<ul \n >{#each items as item \n   }<li>{item}</li \n >{/each\n}</ul>";
+        let out = strip_svelte(src);
+        assert_eq!(out, exp);
+    }
+
+    /// Svelte `{#if}` block with whitespace around tags.
+    #[test]
+    fn svelte_if_block_strips_whitespace() {
+        let src = "<div>\n  {#if show}\n    <span>content</span>\n  {/if}\n</div>";
+        let exp = "<div \n >{#if show \n   }<span>content</span \n >{/if\n}</div>";
+        let out = strip_svelte(src);
+        assert_eq!(out, exp);
+    }
+
+    /// Svelte `{#if}` with `{:else}` block.
+    #[test]
+    fn svelte_if_else_strips_whitespace() {
+        let src = "<div>\n  {#if show}\n    <span>yes</span>\n  {:else}\n    <span>no</span>\n  {/if}\n</div>";
+        let exp = "<div \n >{#if show \n   }<span>yes</span \n >{:else \n   }<span>no</span \n >{/if\n}</div>";
+        let out = strip_svelte(src);
+        assert_eq!(out, exp);
+    }
+
+    /// Nested Svelte `{#if}` blocks.
+    #[test]
+    fn svelte_nested_if_strips_whitespace() {
+        let src =
+            "<div>\n  {#if a}\n    {#if b}\n      <span>nested</span>\n    {/if}\n  {/if}\n</div>";
+        let exp =
+            "<div \n >{#if a \n   }{#if b \n     }<span>nested</span \n   >{/if \n }{/if\n}</div>";
+        let out = strip_svelte(src);
+        assert_eq!(out, exp);
+    }
+
+    /// Svelte `{#each}` with nested `{#if}`.
+    #[test]
+    fn svelte_each_with_nested_if_strips_whitespace() {
+        let src = "<ul>\n  {#each items as item}\n    <li>\n      {#if item.visible}\n        <span>{item.name}</span>\n      {/if}\n    </li>\n  {/each}\n</ul>";
+        let exp = "<ul \n >{#each items as item \n   }<li \n     >{#if item.visible \n       }<span>{item.name}</span \n     >{/if \n   }</li \n >{/each\n}</ul>";
+        let out = strip_svelte(src);
+        assert_eq!(out, exp);
+    }
+
+    /// Svelte `{#if}` with `{:else if}` and `{:else}`.
+    #[test]
+    fn svelte_if_else_if_else_strips_whitespace() {
+        let src = "<div>\n  {#if a}\n    <span>A</span>\n  {:else if b}\n    <span>B</span>\n  {:else}\n    <span>C</span>\n  {/if}\n</div>";
+        let exp = "<div \n >{#if a \n   }<span>A</span \n >{:else if b \n   }<span>B</span \n >{:else \n   }<span>C</span \n >{/if\n}</div>";
+        let out = strip_svelte(src);
+        assert_eq!(out, exp);
+    }
+
+    /// Svelte control flow mixed with regular elements.
+    #[test]
+    fn svelte_mixed_control_flow_and_elements() {
+        let src = "<div>\n  <h1>Title</h1>\n  {#if show}\n    <p>Content</p>\n  {/if}\n  <footer>End</footer>\n</div>";
+        let exp = "<div \n ><h1>Title</h1 \n >{#if show \n   }<p>Content</p \n >{/if \n }<footer>End</footer\n></div>";
+        let out = strip_svelte(src);
+        assert_eq!(out, exp);
     }
 }
