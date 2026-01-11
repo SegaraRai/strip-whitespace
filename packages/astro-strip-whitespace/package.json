@@ -1,8 +1,27 @@
 {
   "name": "astro-strip-whitespace",
   "version": "0.1.0",
-  "keywords": ["astro-integration"],
+  "description": "Astro integration that strips inter-node whitespace in Astro and Svelte templates.",
+  "license": "MIT",
+  "author": "SegaraRai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SegaraRai/strip-whitespace.git",
+    "directory": "packages/astro-strip-whitespace"
+  },
+  "homepage": "https://github.com/SegaraRai/strip-whitespace#readme",
+  "bugs": {
+    "url": "https://github.com/SegaraRai/strip-whitespace/issues"
+  },
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "svelte",
+    "whitespace",
+    "minify"
+  ],
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
@@ -12,7 +31,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "dependencies": {
     "unplugin-strip-whitespace": "workspace:*"
@@ -24,7 +44,7 @@
     "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",
     "strip-whitespace-wasm": "workspace:*",
-    "tsdown": "^0.18.3",
+    "tsdown": "^0.19.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   },
@@ -33,6 +53,8 @@
   },
   "scripts": {
     "build": "tsdown",
+    "prepack": "node ../../scripts/pack-meta.mjs",
+    "postpack": "node ../../scripts/pack-meta.mjs --cleanup",
     "test": "vitest run"
   }
 }
