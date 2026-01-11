@@ -1,6 +1,6 @@
 {
   "name": "unplugin-strip-whitespace",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Unplugin to strip inter-node whitespace in Astro and Svelte templates (Vite/Rollup/Webpack/Rspack/etc).",
   "license": "MIT",
   "author": "SegaraRai",
