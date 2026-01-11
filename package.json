@@ -6,7 +6,7 @@
     "changeset": "changeset",
     "release": "pnpm run build && pnpm publish -r --access public --provenance",
     "test": "vitest",
-    "build": "pnpm build:wasm && pnpm build:plugin",
+    "build": "pnpm run build:wasm && pnpm run build:plugin",
     "build:e2e-astro": "pnpm --filter strip-whitespace-e2e-astro run build",
     "build:plugin": "pnpm run build:plugin-unplugin && pnpm run build:plugin-astro",
     "build:plugin-astro": "pnpm --filter astro-strip-whitespace run build",
