@@ -32,9 +32,8 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target/release/deps
-          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-${{ matrix.target }}-
             ${{ runner.os }}-cargo-
 
       - uses: pnpm/action-setup@v4
