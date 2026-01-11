@@ -2,4 +2,4 @@
 "unplugin-strip-whitespace": minor
 ---
 
-Initial version up
+Release the initial public version of the plugin.
