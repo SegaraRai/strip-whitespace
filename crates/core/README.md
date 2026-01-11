@@ -11,7 +11,7 @@ This crate:
 It’s consumed by:
 
 - The WASM wrapper in `crates/wasm` (used by the JS tooling packages).
-- The fuzz harness in `crates/fuzz`.
+- The fuzz harness in `fuzz`.
 
 ## API
 
