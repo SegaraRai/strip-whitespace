@@ -32,7 +32,9 @@ Minifying the _built output_ (HTML emitted after compilation) can introduce hydr
 ### Astro integration
 
 ```bash
-pnpm add -D astro-strip-whitespace
+astro add astro-strip-whitespace
+
+# or: pnpm add -D astro-strip-whitespace
 # or: npm i -D astro-strip-whitespace
 # or: yarn add -D astro-strip-whitespace
 ```
@@ -41,6 +43,8 @@ pnpm add -D astro-strip-whitespace
 
 ```bash
 pnpm add -D unplugin-strip-whitespace
+# or: npm i -D unplugin-strip-whitespace
+# or: yarn add -D unplugin-strip-whitespace
 ```
 
 ## Usage
