@@ -13,8 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  node:
-    name: Node build & test
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
     timeout-minutes: 30
