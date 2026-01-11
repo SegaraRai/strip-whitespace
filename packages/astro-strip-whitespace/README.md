@@ -9,9 +9,9 @@ Under the hood, this prepends the Vite plugin from [`unplugin-strip-whitespace`]
 ```bash
 astro add astro-strip-whitespace
 
-# pnpm add -D astro-strip-whitespace
-# npm i -D astro-strip-whitespace
-# yarn add -D astro-strip-whitespace
+# or: pnpm add -D astro-strip-whitespace
+# or: npm i -D astro-strip-whitespace
+# or: yarn add -D astro-strip-whitespace
 ```
 
 ## Usage
