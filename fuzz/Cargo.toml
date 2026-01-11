@@ -8,7 +8,7 @@ edition = "2024"
 cargo-fuzz = true
 
 [dependencies]
-strip-whitespace = { path = "../core" }
+strip-whitespace = { path = "../crates/core" }
 libfuzzer-sys = "0.4"
 serde_json = "1"
 
