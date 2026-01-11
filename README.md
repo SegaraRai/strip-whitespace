@@ -4,6 +4,8 @@
 
 Strip inter-node whitespace in Astro and Svelte templates.
 
+![Before/after transform](assets/transform.svg)
+
 This repo contains:
 
 - A Rust core that parses templates via tree-sitter and rewrites whitespace.

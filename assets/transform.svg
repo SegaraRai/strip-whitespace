@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="464" viewBox="0 0 600 464" role="img" aria-label="strip-whitespace: before and after code transformation">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc" />
+      <stop offset="1" stop-color="#eef2ff" />
+    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0b1220" flood-opacity="0.18" />
+    </filter>
+
+    <style>
+      :root {
+        --page-bg: url(#bg);
+        --title: #0f172a;
+        --muted: #475569;
+        --card: #ffffff;
+        --card-stroke: rgba(15, 23, 42, 0.10);
+        --code: #0b1220;
+        --code-muted: #64748b;
+        --accent: #4f46e5;
+        --accent-2: #06b6d4;
+
+        --tok-tag: #4f46e5;
+        --tok-attr: #0284c7;
+        --tok-string: #15803d;
+        --tok-expr: #b45309;
+        --tok-keyword: #7c3aed;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --title: #e5e7eb;
+          --muted: #9ca3af;
+          --card: #0b1220;
+          --card-stroke: rgba(148, 163, 184, 0.18);
+          --code: #e5e7eb;
+          --code-muted: #94a3b8;
+          --accent: #a5b4fc;
+          --accent-2: #67e8f9;
+
+          --tok-tag: #a5b4fc;
+          --tok-attr: #67e8f9;
+          --tok-string: #86efac;
+          --tok-expr: #fdba74;
+          --tok-keyword: #d8b4fe;
+        }
+      }
+
+      .subtitle {
+        font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        fill: var(--muted);
+      }
+
+      .code {
+        font: 13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        fill: var(--code);
+      }
+
+      .codeMuted {
+        fill: var(--code-muted);
+      }
+
+      .tokTag { fill: var(--tok-tag); }
+      .tokAttr { fill: var(--tok-attr); }
+      .tokString { fill: var(--tok-string); }
+      .tokExpr { fill: var(--tok-expr); }
+      .tokKeyword { fill: var(--tok-keyword); }
+      .tokComment { fill: var(--code-muted); }
+
+      .arrow {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .arrowGlow {
+        fill: none;
+        stroke: var(--accent-2);
+        stroke-width: 12;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: 0.14;
+      }
+
+      .card {
+        fill: var(--card);
+        stroke: var(--card-stroke);
+        stroke-width: 1;
+      }
+
+      .divider {
+        stroke: rgba(100, 116, 139, 0.28);
+        stroke-width: 1;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .divider {
+          stroke: rgba(148, 163, 184, 0.22);
+        }
+      }
+    </style>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="600" height="464" rx="22" fill="url(#bg)" />
+
+  <!-- left panel (input) -->
+  <g filter="url(#shadow)">
+    <rect class="card" x="16" y="16" width="260" height="432" rx="18" />
+  </g>
+
+  <text class="code" xml:space="preserve" x="0" y="0" transform="translate(32 48)">
+    <tspan x="0" dy="0"><tspan class="tokComment">---</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokKeyword">export</tspan> <tspan class="tokKeyword">interface</tspan> <tspan class="tokKeyword">Props</tspan> <tspan class="tokExpr">{</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokAttr">name</tspan><tspan class="tokExpr">:</tspan> <tspan class="tokKeyword">string</tspan><tspan class="tokExpr">;</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokAttr">items</tspan><tspan class="tokExpr">:</tspan> <tspan class="tokKeyword">TaskItem</tspan><tspan class="tokExpr">[];</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokExpr">}</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokComment">---</tspan></tspan>
+    <tspan x="0" dy="20"> </tspan>
+
+    <tspan x="0" dy="20"><tspan class="tokTag">&lt;Title&gt;</tspan></tspan>
+    <tspan x="0" dy="20">  Hello, <tspan class="tokExpr">{</tspan><tspan class="tokString">&quot; &quot;</tspan><tspan class="tokExpr">}</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokExpr">{</tspan><tspan class="tokAttr">name</tspan><tspan class="tokExpr">}</tspan>!</tspan>
+    <tspan x="0" dy="20"><tspan class="tokTag">&lt;/Title&gt;</tspan></tspan>
+    <tspan x="0" dy="20"> </tspan>
+
+    <tspan x="0" dy="20"><tspan class="tokTag">&lt;ul&gt;</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokExpr">{</tspan><tspan class="tokAttr">items</tspan><tspan class="tokExpr">.map(</tspan><tspan class="tokExpr">(</tspan><tspan class="tokAttr">item</tspan><tspan class="tokExpr">) =&gt; (</tspan></tspan>
+    <tspan x="0" dy="20">    <tspan class="tokTag">&lt;li&gt;</tspan></tspan>
+    <tspan x="0" dy="20">      Task:</tspan>
+    <tspan x="0" dy="20">      <tspan class="tokExpr">{</tspan><tspan class="tokAttr">item</tspan><tspan class="tokExpr">.</tspan><tspan class="tokAttr">title</tspan><tspan class="tokExpr">}</tspan></tspan>
+    <tspan x="0" dy="20">    <tspan class="tokTag">&lt;/li&gt;</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokExpr">))}</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokTag">&lt;/ul&gt;</tspan></tspan>
+  </text>
+
+  <!-- right panel (output) -->
+  <g filter="url(#shadow)">
+    <rect class="card" x="324" y="16" width="260" height="432" rx="18" />
+  </g>
+
+  <text class="code" xml:space="preserve" x="0" y="0" transform="translate(340 48)">
+    <tspan x="0" dy="0"><tspan class="tokComment">---</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokKeyword">export</tspan> <tspan class="tokKeyword">interface</tspan> <tspan class="tokKeyword">Props</tspan> <tspan class="tokExpr">{</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokAttr">name</tspan><tspan class="tokExpr">:</tspan> <tspan class="tokKeyword">string</tspan><tspan class="tokExpr">;</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokAttr">items</tspan><tspan class="tokExpr">:</tspan> <tspan class="tokKeyword">TaskItem</tspan><tspan class="tokExpr">[];</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokExpr">}</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokComment">---</tspan></tspan>
+    <tspan x="0" dy="20"> </tspan>
+
+    <tspan x="0" dy="20"><tspan class="tokTag">&lt;Title</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokTag">&gt;</tspan>Hello,<tspan class="tokExpr">{ </tspan><tspan class="tokString">&quot; &quot;</tspan></tspan>
+    <tspan x="0" dy="20"> <tspan class="tokExpr">}</tspan><tspan class="tokExpr">{</tspan><tspan class="tokAttr">name</tspan><tspan class="tokExpr">}</tspan>!<tspan class="tokTag">&lt;/Title</tspan></tspan>
+    <tspan x="0" dy="20"> </tspan>
+    <tspan x="0" dy="20"> </tspan>
+
+    <tspan x="0" dy="20"><tspan class="tokTag">&gt;</tspan><tspan class="tokTag">&lt;ul</tspan></tspan>
+    <tspan x="0" dy="20"> <tspan class="tokTag">&gt;</tspan><tspan class="tokExpr">{</tspan><tspan class="tokAttr">items</tspan><tspan class="tokExpr">.map(</tspan><tspan class="tokExpr">(</tspan><tspan class="tokAttr">item</tspan><tspan class="tokExpr">) =&gt; (</tspan></tspan>
+    <tspan x="0" dy="20">    <tspan class="tokTag">&lt;li</tspan></tspan>
+    <tspan x="0" dy="20">     <tspan class="tokTag">&gt;</tspan>Task:<tspan class="tokExpr">{</tspan></tspan>
+    <tspan x="0" dy="20">      <tspan class="tokAttr">item</tspan><tspan class="tokExpr">.</tspan><tspan class="tokAttr">title</tspan></tspan>
+    <tspan x="0" dy="20">   <tspan class="tokExpr">}</tspan><tspan class="tokTag">&lt;/li&gt;</tspan></tspan>
+    <tspan x="0" dy="20">  <tspan class="tokExpr">))</tspan></tspan>
+    <tspan x="0" dy="20"><tspan class="tokExpr">}</tspan><tspan class="tokTag">&lt;/ul&gt;</tspan></tspan>
+  </text>
+
+  <!-- arrow between -->
+  <path class="arrowGlow" d="M 282 232 C 296 232, 300 232, 314 232" />
+  <path class="arrow" d="M 282 232 C 296 232, 300 232, 314 232" />
+  <path class="arrow" d="M 306 222 L 318 232 L 306 242" />
+</svg>
