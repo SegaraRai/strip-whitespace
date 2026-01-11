@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "changeset": "changeset",
+    "release": "pnpm run build && pnpm publish -r --access public --provenance",
     "test": "vitest",
     "build": "pnpm build:wasm && pnpm build:plugin",
     "build:e2e-astro": "pnpm --filter strip-whitespace-e2e-astro run build",
