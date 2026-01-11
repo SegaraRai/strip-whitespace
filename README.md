@@ -4,7 +4,7 @@
 
 Strip inter-node whitespace in Astro and Svelte templates.
 
-![Before/after transform](assets/transform.svg)
+<img src="assets/transform.svg" alt="Before/after transform" style="width:100%;height:auto;" />
 
 This repo contains:
 
