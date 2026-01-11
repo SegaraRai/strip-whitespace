@@ -51,7 +51,8 @@ fn fixtures_match_expected_output() {
         let expected = read_fixture(expected_name);
         let language = detect_language(input_name);
 
-        let actual = strip_whitespace_no_sourcemap(&input, language, &StripConfig::default()).unwrap();
+        let actual =
+            strip_whitespace_no_sourcemap(&input, language, &StripConfig::default()).unwrap();
         assert_eq!(actual, expected, "fixture mismatch: {input_name}");
 
         // Idempotence: once stripped, stripping again should not change.
