@@ -90,10 +90,35 @@ Refer to the bundler-specific unplugin docs for the exact wiring pattern.
 
 ## Development
 
-Common commands:
+This is a monorepo containing Rust crates and JavaScript packages:
+
+```text
+strip-whitespace/
+├── crates/             # [Rust] Rust crates excluding fuzz targets
+│   ├── core/           #        Core Rust library for parsing & rewriting templates
+│   └── wasm/           #        WASM wrapper for JavaScript integration
+├── packages/           # [JS] JavaScript packages
+│   ├── wasm/                       # WASM bindings generated from crates/wasm (private package)
+│   ├── unplugin-strip-whitespace/  # Unplugin for Vite/Rollup/Webpack/etc
+│   └── astro-strip-whitespace/     # Astro integration wrapper
+├── examples/           # [JS] Example projects
+│   └── e2e-astro/      #      End-to-end Astro test app
+├── fixtures/           # Test fixtures
+├── fuzz/               # [Rust] Fuzzing targets for Rust crates
+├── scripts/            # Build and utility scripts
+└── assets/             # Documentation assets (images, SVGs)
+```
+
+### Key Components
+
+- **[crates/core/](crates/core/)**: The core Rust library that uses tree-sitter to parse Astro and Svelte templates and rewrite whitespace.
+- **[crates/wasm/](crates/wasm/)**: WASM bindings that expose the Rust core to JavaScript via wasm-pack.
+- **[packages/unplugin-strip-whitespace/](packages/unplugin-strip-whitespace/)**: An [unplugin](https://github.com/unjs/unplugin) that works with Vite, Rollup, Webpack, esbuild, and other bundlers.
+- **[packages/astro-strip-whitespace/](packages/astro-strip-whitespace/)**: A tiny Astro integration that configures the Vite plugin for Astro projects.
+- **[examples/e2e-astro/](examples/e2e-astro/)**: An example Astro app for testing and development.
+
+### Common Commands
 
 - `pnpm test` - run JS tests (Vitest)
-- `pnpm build` - build WASM + packages
-- `pnpm build:e2e-astro` / `pnpm dev:e2e-astro` - run the Astro example app
-
-The Rust core lives in `crates/core`.
+- `pnpm run build` - build WASM + packages
+- `pnpm run build:e2e-astro` / `pnpm run dev:e2e-astro` - run the Astro example app
