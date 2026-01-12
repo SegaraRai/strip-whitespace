@@ -32,14 +32,14 @@ function getLanguageFromFilename(filename: string) {
   return language;
 }
 
-it.for([
+it.concurrent.for([
   ["../../../examples/e2e-astro/src/layouts/Layout.astro", 2000],
-  ["../../../fixtures/complex.astro", 750],
+  ["../../../fixtures/complex.astro", 2000],
   ["../../../examples/e2e-astro/src/components/SvelteCounter.svelte", 2000],
-  ["../../../fixtures/complex.svelte", 750],
+  ["../../../fixtures/complex.svelte", 2000],
 ] as const)(
   "wasm stress test: %s x %d",
-  { timeout: 60_000 },
+  { timeout: 120_000 },
   async ([filepath, iterations], { expect }) => {
     const initOutput = initWasmOnce();
 
