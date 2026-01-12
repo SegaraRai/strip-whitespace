@@ -3,5 +3,6 @@
   "compilerOptions": {
     "types": ["astro/client"],
     "experimentalDecorators": true
-  }
+  },
+  "exclude": ["dist", "snapshots"]
 }

@@ -110,6 +110,7 @@
     "build": "tsdown",
     "prepack": "node ../../scripts/pack-meta.mjs",
     "postpack": "node ../../scripts/pack-meta.mjs --cleanup",
-    "test": "vitest run"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   }
 }

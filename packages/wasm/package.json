@@ -15,5 +15,8 @@
       "default": "./dist/index.js"
     },
     "./wasm": "./dist/index_bg.wasm"
+  },
+  "scripts": {
+    "typecheck": "echo \"\""
   }
 }
