@@ -65,4 +65,4 @@ jobs:
 
       - run: cargo +nightly install cargo-fuzz --locked
 
-      - run: cargo +nightly fuzz run ${{ matrix.target }} -- -runs=5000
+      - run: cargo +nightly fuzz run ${{ matrix.target }} -- -runs=20000
