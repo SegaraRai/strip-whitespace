@@ -63,6 +63,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-fuzz-
 
-      - run: cargo +nightly install cargo-fuzz --locked
+      # --force avoids failures when a cached copy already exists
+      - run: cargo +nightly install cargo-fuzz --force --locked
 
       - run: cargo +nightly fuzz run ${{ matrix.target }} -- -runs=20000
