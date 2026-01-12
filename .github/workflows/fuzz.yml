@@ -2,9 +2,26 @@ name: Fuzz
 
 on:
   workflow_dispatch:
-  schedule:
-    # Weekly (Sunday 03:00 UTC)
-    - cron: "0 3 * * 0"
+  push:
+    branches:
+      - main
+    paths:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/**"
+      - "fuzz/**"
+      - "scripts/**"
+      - ".github/workflows/fuzz.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/**"
+      - "fuzz/**"
+      - "scripts/**"
+      - ".github/workflows/fuzz.yml"
 
 concurrency:
   group: fuzz-${{ github.ref }}
