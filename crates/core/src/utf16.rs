@@ -196,10 +196,9 @@ impl Utf16LineIndex {
 
         while cur_byte < clamped {
             let rel = cur_byte - self.start;
-            if rel >= line.len() {
+            let Some(ch) = line[rel..].chars().next() else {
                 break;
-            }
-            let ch = line[rel..].chars().next().unwrap();
+            };
             let ch_len = ch.len_utf8();
             let next_byte = cur_byte + ch_len;
             if next_byte <= clamped {
@@ -246,10 +245,9 @@ impl Utf16LineIndex {
         let line = &s[self.start..self.end];
         while cur_utf16 < utf16_col && cur_byte < self.end {
             let rel = cur_byte - self.start;
-            if rel >= line.len() {
+            let Some(ch) = line[rel..].chars().next() else {
                 break;
-            }
-            let ch = line[rel..].chars().next().unwrap();
+            };
             let u16_len = ch.len_utf16();
             if cur_utf16 + u16_len > utf16_col {
                 // Target falls inside a surrogate pair boundary (e.g. emoji). Clamp to the start
@@ -296,7 +294,9 @@ mod tests {
         let mut col = 0usize;
         let mut cur = 0usize;
         while cur < clamped {
-            let ch = line[cur..].chars().next().unwrap();
+            let Some(ch) = line[cur..].chars().next() else {
+                break;
+            };
             let next = cur + ch.len_utf8();
             if next <= clamped {
                 col += ch.len_utf16();
@@ -314,8 +314,10 @@ mod tests {
     fn naive_utf16_col_to_byte(line: &str, utf16_col: usize) -> usize {
         let mut cur_u16 = 0usize;
         let mut cur_byte = 0usize;
-        while cur_byte < line.len() {
-            let ch = line[cur_byte..].chars().next().unwrap();
+        loop {
+            let Some(ch) = line[cur_byte..].chars().next() else {
+                break;
+            };
             let u16 = ch.len_utf16();
             if cur_u16 + u16 > utf16_col {
                 break;
