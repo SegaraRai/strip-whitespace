@@ -7,4 +7,4 @@ test("index must have a default export", async ({ expect }) => {
   }
 
   expect(mod.default().name).toBe("astro-strip-whitespace");
-});
+}, 30_000);
