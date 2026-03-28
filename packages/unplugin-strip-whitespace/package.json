@@ -53,32 +53,33 @@
     "LICENSE"
   ],
   "dependencies": {
-    "unplugin": "^2.3.11"
+    "unplugin": "^3.0.0"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
     "@farmfe/core": "^1.7.11",
-    "@nuxt/kit": "^4.2.2",
-    "@nuxt/schema": "^4.2.2",
-    "@rspack/core": "^1.7.1",
-    "@types/node": "^25.0.6",
-    "astro": "^5.16.8",
-    "prettier": "^3.7.4",
+    "@nuxt/kit": "^4.4.2",
+    "@nuxt/schema": "^4.4.2",
+    "@rspack/core": "^1.7.10",
+    "@types/node": "^25.5.0",
+    "astro": "^6.1.1",
+    "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "rolldown": "1.0.0-beta.59",
-    "rollup": "^4.55.1",
+    "rolldown": "1.0.0-rc.12",
+    "rollup": "^4.60.0",
     "strip-whitespace-wasm": "workspace:*",
-    "tsdown": "^0.19.0",
+    "tsdown": "^0.21.6",
     "typescript": "^5.9.3",
     "unloader": "^0.8.3",
-    "vitest": "^4.0.16",
-    "webpack": "^5.104.1"
+    "vitest": "^4.1.2",
+    "webpack": "^5.105.4"
   },
   "peerDependencies": {
     "@farmfe/core": "^1",
     "@nuxt/kit": "^3 || ^4",
     "@nuxt/schema": "^3 || ^4",
     "esbuild": "*",
+    "rolldown": "^1.0.0-0",
     "rollup": "^3 || ^4",
     "vite": ">=3",
     "webpack": "^4 || ^5"
@@ -94,6 +95,9 @@
       "optional": true
     },
     "esbuild": {
+      "optional": true
+    },
+    "rolldown": {
       "optional": true
     },
     "rollup": {

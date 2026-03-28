@@ -17,13 +17,13 @@
     "dev:e2e-astro": "pnpm --filter strip-whitespace-e2e-astro run dev"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.8",
-    "prettier": "^3.7.4",
+    "@changesets/cli": "^2.30.0",
+    "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-svelte": "^3.4.1",
+    "prettier-plugin-svelte": "^3.5.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "vitest": "^4.0.16",
-    "wasm-pack": "^0.13.1"
+    "vitest": "^4.1.2",
+    "wasm-pack": "^0.14.0"
   }
 }

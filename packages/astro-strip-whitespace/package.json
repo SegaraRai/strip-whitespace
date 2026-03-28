@@ -39,15 +39,15 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
-    "@types/node": "^25.0.6",
-    "astro": "^5.16.8",
-    "prettier": "^3.7.4",
+    "@types/node": "^25.5.0",
+    "astro": "^6.1.1",
+    "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "strip-whitespace-wasm": "workspace:*",
-    "tsdown": "^0.19.0",
+    "tsdown": "^0.21.6",
     "typescript": "^5.9.3",
-    "vite": "^6.4.1",
-    "vitest": "^4.0.16"
+    "vite": "^7.3.1",
+    "vitest": "^4.1.2"
   },
   "peerDependencies": {
     "astro": ">=5.0.0"
