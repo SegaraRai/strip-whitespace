@@ -1,9 +1,10 @@
 ---
-import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 
+import Layout from "../../layouts/Layout.astro";
+
 const docs = (await getCollection("docs")).sort((a, b) =>
-  a.slug.localeCompare(b.slug),
+  a.id.localeCompare(b.id),
 );
 ---
 
@@ -21,7 +22,7 @@ const docs = (await getCollection("docs")).sort((a, b) =>
     {
       docs.map((entry) => (
         <li>
-          <a href={`/docs/${entry.slug}`}>{entry.data.title}</a>
+          <a href={`/docs/${entry.id}`}>{entry.data.title}</a>
         </li>
       ))
     }
