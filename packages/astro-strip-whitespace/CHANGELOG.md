@@ -1,5 +1,13 @@
 # astro-strip-whitespace
 
+## 0.2.2
+
+### Patch Changes
+
+- abb1246: Updated dependencies.
+- Updated dependencies [abb1246]
+  - unplugin-strip-whitespace@0.2.2
+
 ## 0.2.1
 
 ### Patch Changes
