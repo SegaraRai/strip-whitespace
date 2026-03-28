@@ -9,12 +9,10 @@
 //!
 //! Internals:
 //!
-//! - [`alloc`] contains the tree-sitter allocator override for WASM targets.
 //! - [`edit`] holds the edit model and sourcemap creation/rewriting helpers.
 //! - [`parse`] contains the tree-sitter parsing logic.
 //! - [`utf16`] provides UTF-16 column indexing support for sourcemaps.
 
-pub mod alloc;
 pub mod edit;
 pub mod parse;
 pub mod strip;
